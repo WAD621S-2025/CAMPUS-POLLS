@@ -1,14 +1,13 @@
 <?php
 session_start();
-$host = "localhost";
+$host = "127.0.0.1";
+$port = 3307;
 $username = "root";
 $password = "";
 $dbname = "buzz";
+$conn = new mysqli($host, $username, $password, $dbname, port: $port);
+if ($conn->connect_error) { die("DB connection failed: " . $conn->connect_error); }
 
-$conn = new mysqli($host, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Get poll_id from query string
 $poll_id = isset($_GET['poll_id']) ? (int)$_GET['poll_id'] : 0;

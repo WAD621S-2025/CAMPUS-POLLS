@@ -2,18 +2,13 @@
 session_start();
 
 // Database connection settings
-$host = 'localhost';
-$dbname = 'buzz';
-$username = 'root';
-$password = ''; // Update if you have a password
-
-// Connect to the database
-$conn = new mysqli($host, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die('Connection failed: ' . $conn->connect_error);
-}
+$host = "127.0.0.1";
+$port = 3307;
+$username = "root";
+$password = "";
+$dbname = "buzz";
+$conn = new mysqli($host, $username, $password, $dbname, port: $port);
+if ($conn->connect_error) { die("DB connection failed: " . $conn->connect_error); }
 
 // Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

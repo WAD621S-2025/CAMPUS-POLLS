@@ -5,13 +5,13 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$host = "localhost";
+$host = "127.0.0.1";
+$port = 3307;
 $username = "root";
 $password = "";
 $dbname = "buzz";
-$conn = new mysqli($host, $username, $password, $dbname);
+$conn = new mysqli($host, $username, $password, $dbname, port: $port);
 if ($conn->connect_error) { die("DB connection failed: " . $conn->connect_error); }
-
 $user_id = $_SESSION['user_id'];
 
 // Fetch user info

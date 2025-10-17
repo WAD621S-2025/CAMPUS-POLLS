@@ -1,6 +1,7 @@
 <?php
 class Database {
-    private $host = 'localhost';
+    private $host = '127.0.0.1';
+    private $port = 3307;
     private $db_name = 'buzz';
     private $username = 'root';
     private $password = '';
