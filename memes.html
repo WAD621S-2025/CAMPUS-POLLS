@@ -74,256 +74,309 @@
     </footer>
     
     <script>
-        let memesData = [
-            {
-                id: 1,
-                image: "https://placehold.co/600x400/fbbf24/1f2937?text=Funny+Meme",
-                caption: "When you finally understand a lecture.",
-                likes: 15,
-                comments: [
-                    { username: "jane_doe", text: "So true!" },
-                    { username: "john_smith", text: "LMAO literally me last week." }
-                ],
-                liked: false
-            },
-            {
-                id: 2,
-                image: "https://placehold.co/600x400/f59e0b/ffffff?text=Another+Meme",
-                caption: "Finals week got me like...",
-                likes: 22,
-                comments: [],
-                liked: false
-            }
-        ];
+      const API_URL = '/api/memes.php';
+let memesData = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderMemes();
-            setupUploadHandler();
+document.addEventListener('DOMContentLoaded', () => {
+    loadMemes();
+    setupUploadHandler();
+});
+
+// Load memes from database
+async function loadMemes() {
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Failed to load memes');
+        
+        memesData = await response.json();
+        renderMemes();
+    } catch (error) {
+        console.error('Error loading memes:', error);
+        showNotification('Failed to load memes', 'error');
+    }
+}
+
+function renderMemes() {
+    const grid = document.getElementById('memes-grid');
+    grid.innerHTML = '';
+    
+    if (memesData.length === 0) {
+        grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No memes yet. Be the first to upload!</p>';
+        return;
+    }
+    
+    memesData.forEach(meme => {
+        const memeCard = createMemeCard(meme);
+        grid.appendChild(memeCard);
+    });
+}
+
+function createMemeCard(meme) {
+    const card = document.createElement('div');
+    card.className = 'meme-card rounded-lg overflow-hidden shadow-md border-2 border-amber-300 flex flex-col bg-white';
+    card.innerHTML = `
+        <div class="relative">
+            <img src="${meme.image}" alt="Campus Meme" class="w-full h-48 object-cover">
+        </div>
+        <div class="p-4 flex-grow">
+            <p class="text-sm">${meme.caption}</p>
+            <div class="flex justify-between items-center mt-2 text-gray-500">
+                <div class="flex items-center space-x-3">
+                    <button class="like-btn hover:text-amber-600 transition-colors ${meme.liked ? 'text-amber-600' : ''}" 
+                            data-id="${meme.id}" title="Like">
+                        <i class="fas fa-heart"></i> 
+                        <span class="like-count">${meme.likes}</span>
+                    </button>
+                    <button class="comment-toggle hover:text-amber-700 transition-colors" 
+                            data-id="${meme.id}" title="Comment">
+                        <i class="fas fa-comment"></i> 
+                        <span class="comment-count">${meme.comments?.length || 0}</span>
+                    </button>
+                </div>
+                <button class="share-btn hover:text-amber-700 transition-colors" 
+                        data-id="${meme.id}" title="Share">
+                    <i class="fas fa-share"></i>
+                </button>
+            </div>
+        </div>
+        <div class="comments-section p-4 border-t-2 border-amber-100 bg-amber-50" id="comments-${meme.id}">
+            <h4 class="text-sm font-semibold mb-2">Comments</h4>
+            <div class="comments-list space-y-2 text-xs max-h-32 overflow-y-auto mb-3">
+                ${(meme.comments || []).map(comment => `
+                    <p class="comment-new">
+                        <strong class="text-amber-700">@${comment.username || 'user'}:</strong> ${comment.text}
+                    </p>
+                `).join('')}
+            </div>
+            <div class="flex gap-2">
+                <input type="text" placeholder="Add a comment..." 
+                       class="comment-input flex-1 p-2 border-2 border-amber-300 rounded-md text-xs focus:border-amber-500 focus:outline-none"
+                       data-id="${meme.id}">
+                <button class="add-comment-btn bg-amber-500 text-white px-3 py-1 rounded-md text-xs hover:bg-amber-600"
+                        data-id="${meme.id}">
+                    Post
+                </button>
+            </div>
+        </div>
+    `;
+
+    setupCardEventListeners(card, meme);
+    return card;
+}
+
+function setupCardEventListeners(card, meme) {
+    const likeBtn = card.querySelector('.like-btn');
+    likeBtn.addEventListener('click', (e) => handleLike(e, meme.id));
+
+    const shareBtn = card.querySelector('.share-btn');
+    shareBtn.addEventListener('click', (e) => handleShare(e, meme.id));
+
+    const addCommentBtn = card.querySelector('.add-comment-btn');
+    addCommentBtn.addEventListener('click', () => handleAddComment(meme.id));
+
+    const commentInput = card.querySelector('.comment-input');
+    commentInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleAddComment(meme.id);
+        }
+    });
+}
+
+async function handleLike(e, memeId) {
+    const meme = memesData.find(m => m.id === memeId);
+    const button = e.currentTarget;
+    const icon = button.querySelector('i');
+    const countSpan = button.querySelector('.like-count');
+    
+    const wasLiked = meme.liked;
+    meme.liked = !meme.liked;
+    meme.likes += meme.liked ? 1 : -1;
+    
+    button.classList.toggle('text-amber-600');
+    countSpan.textContent = meme.likes;
+    
+    icon.classList.add('like-animation');
+    setTimeout(() => icon.classList.remove('like-animation'), 500);
+    
+    if (meme.liked) {
+        createFloatingHearts(button);
+    }
+    
+    // Update database
+    try {
+        const response = await fetch(`${API_URL}/${memeId}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ liked: meme.liked })
         });
+        
+        if (!response.ok) throw new Error('Failed to update like');
+    } catch (error) {
+        console.error('Error updating like:', error);
+        // Revert on error
+        meme.liked = wasLiked;
+        meme.likes += meme.liked ? 1 : -1;
+        button.classList.toggle('text-amber-600');
+        countSpan.textContent = meme.likes;
+        showNotification('Failed to update like', 'error');
+    }
+}
 
-        function renderMemes() {
-            const grid = document.getElementById('memes-grid');
-            grid.innerHTML = '';
+function createFloatingHearts(button) {
+    const rect = button.getBoundingClientRect();
+    
+    for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('i');
+            heart.className = 'fas fa-heart floating-heart';
+            heart.style.left = `${rect.left + Math.random() * 30}px`;
+            heart.style.top = `${rect.top}px`;
+            heart.style.fontSize = `${Math.random() * 10 + 15}px`;
+            document.body.appendChild(heart);
             
-            memesData.forEach(meme => {
-                const memeCard = createMemeCard(meme);
-                grid.appendChild(memeCard);
-            });
+            setTimeout(() => heart.remove(), 1500);
+        }, i * 100);
+    }
+}
+
+function handleShare(e, memeId) {
+    const button = e.currentTarget;
+    const icon = button.querySelector('i');
+    
+    icon.classList.add('share-animation');
+    setTimeout(() => icon.classList.remove('share-animation'), 300);
+    
+    showNotification('Link copied to clipboard!', 'success');
+}
+
+async function handleAddComment(memeId) {
+    const meme = memesData.find(m => m.id === memeId);
+    const input = document.querySelector(`.comment-input[data-id="${memeId}"]`);
+    const commentText = input.value.trim();
+    
+    if (!commentText) {
+        showNotification('Please enter a comment', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/${memeId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: 1,
+                text: commentText
+            })
+        });
+        
+        if (!response.ok) throw new Error('Failed to post comment');
+        
+        const result = await response.json();
+        
+        const newComment = {
+            username: 'current_user',
+            text: commentText
+        };
+        
+        if (!meme.comments) meme.comments = [];
+        meme.comments.push(newComment);
+        
+        const commentsList = document.querySelector(`#comments-${memeId} .comments-list`);
+        const commentElement = document.createElement('p');
+        commentElement.className = 'comment-new';
+        commentElement.innerHTML = `<strong class="text-amber-700">@${newComment.username}:</strong> ${newComment.text}`;
+        commentsList.appendChild(commentElement);
+        
+        const commentCount = document.querySelector(`.comment-toggle[data-id="${memeId}"] .comment-count`);
+        commentCount.textContent = meme.comments.length;
+        
+        input.value = '';
+        showNotification('Comment posted!', 'success');
+    } catch (error) {
+        console.error('Error posting comment:', error);
+        showNotification('Failed to post comment', 'error');
+    }
+}
+
+function setupUploadHandler() {
+    const fileInput = document.getElementById('meme-upload');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImg = document.getElementById('meme-preview');
+    const uploadBtn = document.getElementById('upload-btn');
+    
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewContainer.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
         }
-
-        function createMemeCard(meme) {
-            const card = document.createElement('div');
-            card.className = 'meme-card rounded-lg overflow-hidden shadow-md border-2 border-amber-300 flex flex-col bg-white';
-            card.innerHTML = `
-                <div class="relative">
-                    <img src="${meme.image}" alt="Campus Meme" class="w-full h-48 object-cover">
-                </div>
-                <div class="p-4 flex-grow">
-                    <p class="text-sm">${meme.caption}</p>
-                    <div class="flex justify-between items-center mt-2 text-gray-500">
-                        <div class="flex items-center space-x-3">
-                            <button class="like-btn hover:text-amber-600 transition-colors ${meme.liked ? 'text-amber-600' : ''}" 
-                                    data-id="${meme.id}" title="Like">
-                                <i class="fas fa-heart"></i> 
-                                <span class="like-count">${meme.likes}</span>
-                            </button>
-                            <button class="comment-toggle hover:text-amber-700 transition-colors" 
-                                    data-id="${meme.id}" title="Comment">
-                                <i class="fas fa-comment"></i> 
-                                <span class="comment-count">${meme.comments.length}</span>
-                            </button>
-                        </div>
-                        <button class="share-btn hover:text-amber-700 transition-colors" 
-                                data-id="${meme.id}" title="Share">
-                            <i class="fas fa-share"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="comments-section p-4 border-t-2 border-amber-100 bg-amber-50" id="comments-${meme.id}">
-                    <h4 class="text-sm font-semibold mb-2">Comments</h4>
-                    <div class="comments-list space-y-2 text-xs max-h-32 overflow-y-auto mb-3">
-                        ${meme.comments.map(comment => `
-                            <p class="comment-new">
-                                <strong class="text-amber-700">@${comment.username}:</strong> ${comment.text}
-                            </p>
-                        `).join('')}
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" placeholder="Add a comment..." 
-                               class="comment-input flex-1 p-2 border-2 border-amber-300 rounded-md text-xs focus:border-amber-500 focus:outline-none"
-                               data-id="${meme.id}">
-                        <button class="add-comment-btn bg-amber-500 text-white px-3 py-1 rounded-md text-xs hover:bg-amber-600"
-                                data-id="${meme.id}">
-                            Post
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            setupCardEventListeners(card, meme);
-            return card;
+    });
+    
+    uploadBtn.addEventListener('click', async () => {
+        const caption = document.getElementById('meme-caption').value.trim();
+        const file = fileInput.files[0];
+        
+        if (!file || !caption) {
+            showNotification('Please select an image and add a caption!', 'error');
+            return;
         }
-
-        function setupCardEventListeners(card, meme) {
-            const likeBtn = card.querySelector('.like-btn');
-            likeBtn.addEventListener('click', (e) => handleLike(e, meme.id));
-
-            const shareBtn = card.querySelector('.share-btn');
-            shareBtn.addEventListener('click', (e) => handleShare(e, meme.id));
-
-            const addCommentBtn = card.querySelector('.add-comment-btn');
-            addCommentBtn.addEventListener('click', () => handleAddComment(meme.id));
-
-            const commentInput = card.querySelector('.comment-input');
-            commentInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    handleAddComment(meme.id);
-                }
-            });
-        }
-
-        function handleLike(e, memeId) {
-            const meme = memesData.find(m => m.id === memeId);
-            const button = e.currentTarget;
-            const icon = button.querySelector('i');
-            const countSpan = button.querySelector('.like-count');
+        
+        const uploadText = document.getElementById('upload-text');
+        uploadText.innerHTML = 'Uploading<span class="spinner"></span>';
+        uploadBtn.disabled = true;
+        uploadBtn.classList.add('uploading');
+        
+        try {
+            const formData = new FormData();
+            formData.append('memeImage', file);
+            formData.append('caption', caption);
+            formData.append('user_id', 1);
+            formData.append('title', caption.substring(0, 50));
+            formData.append('category', 'general');
             
-            meme.liked = !meme.liked;
-            meme.likes += meme.liked ? 1 : -1;
-            
-            button.classList.toggle('text-amber-600');
-            countSpan.textContent = meme.likes;
-            
-            icon.classList.add('like-animation');
-            setTimeout(() => icon.classList.remove('like-animation'), 500);
-            
-            if (meme.liked) {
-                createFloatingHearts(button);
-            }
-        }
-
-        function createFloatingHearts(button) {
-            const rect = button.getBoundingClientRect();
-            
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('i');
-                    heart.className = 'fas fa-heart floating-heart';
-                    heart.style.left = `${rect.left + Math.random() * 30}px`;
-                    heart.style.top = `${rect.top}px`;
-                    heart.style.fontSize = `${Math.random() * 10 + 15}px`;
-                    document.body.appendChild(heart);
-                    
-                    setTimeout(() => heart.remove(), 1500);
-                }, i * 100);
-            }
-        }
-
-        function handleShare(e, memeId) {
-            const button = e.currentTarget;
-            const icon = button.querySelector('i');
-            
-            icon.classList.add('share-animation');
-            setTimeout(() => icon.classList.remove('share-animation'), 300);
-            
-            showNotification('Link copied to clipboard!', 'success');
-        }
-
-        function handleAddComment(memeId) {
-            const meme = memesData.find(m => m.id === memeId);
-            const input = document.querySelector(`.comment-input[data-id="${memeId}"]`);
-            const commentText = input.value.trim();
-            
-            if (commentText) {
-                const newComment = {
-                    username: 'current_user',
-                    text: commentText
-                };
-                meme.comments.push(newComment);
-                
-                const commentsList = document.querySelector(`#comments-${memeId} .comments-list`);
-                const commentElement = document.createElement('p');
-                commentElement.className = 'comment-new';
-                commentElement.innerHTML = `<strong class="text-amber-700">@${newComment.username}:</strong> ${newComment.text}`;
-                commentsList.appendChild(commentElement);
-                
-                const commentCount = document.querySelector(`.comment-toggle[data-id="${memeId}"] .comment-count`);
-                commentCount.textContent = meme.comments.length;
-                
-                input.value = '';
-                showNotification('Comment posted!', 'success');
-            }
-        }
-
-        function setupUploadHandler() {
-            const fileInput = document.getElementById('meme-upload');
-            const previewContainer = document.getElementById('preview-container');
-            const previewImg = document.getElementById('meme-preview');
-            const uploadBtn = document.getElementById('upload-btn');
-            
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewImg.src = e.target.result;
-                        previewContainer.classList.remove('hidden');
-                    };
-                    reader.readAsDataURL(file);
-                }
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: formData
             });
             
-            uploadBtn.addEventListener('click', () => {
-                const caption = document.getElementById('meme-caption').value.trim();
-                const file = fileInput.files[0];
-                
-                if (file && caption) {
-                    const uploadText = document.getElementById('upload-text');
-                    uploadText.innerHTML = 'Uploading<span class="spinner"></span>';
-                    uploadBtn.disabled = true;
-                    uploadBtn.classList.add('uploading');
-                    
-                    setTimeout(() => {
-                        const newMeme = {
-                            id: memesData.length + 1,
-                            image: previewImg.src,
-                            caption: caption,
-                            likes: 0,
-                            comments: [],
-                            liked: false
-                        };
-                        memesData.unshift(newMeme);
-                        
-                        renderMemes();
-                        
-                        fileInput.value = '';
-                        document.getElementById('meme-caption').value = '';
-                        previewContainer.classList.add('hidden');
-                        
-                        uploadText.textContent = 'Upload Meme';
-                        uploadBtn.disabled = false;
-                        uploadBtn.classList.remove('uploading');
-                        
-                        showNotification('Meme uploaded successfully!', 'success');
-                    }, 1500);
-                } else {
-                    showNotification('Please select an image and add a caption!', 'error');
-                }
-            });
+            if (!response.ok) throw new Error('Upload failed');
+            
+            const result = await response.json();
+            
+            // Reload memes from database
+            await loadMemes();
+            
+            // Clear form
+            fileInput.value = '';
+            document.getElementById('meme-caption').value = '';
+            previewContainer.classList.add('hidden');
+            
+            showNotification('Meme uploaded successfully!', 'success');
+        } catch (error) {
+            console.error('Error uploading meme:', error);
+            showNotification('Failed to upload meme', 'error');
+        } finally {
+            uploadText.textContent = 'Upload Meme';
+            uploadBtn.disabled = false;
+            uploadBtn.classList.remove('uploading');
         }
+    });
+}
 
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notification-text');
-            
-            notificationText.textContent = message;
-            notification.style.background = type === 'success' ? '#f59e0b' : '#ef4444';
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    
+    notificationText.textContent = message;
+    notification.style.background = type === 'success' ? '#f59e0b' : '#ef4444';
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
     </script>
-</body>
-</html>
