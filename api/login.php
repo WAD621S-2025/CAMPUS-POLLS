@@ -1,15 +1,16 @@
 <?php
 session_start();
 
-// Database connection settings
 $host = "127.0.0.1";
 $port = 3307;
 $username = "root";
 $password = "";
 $dbname = "buzz";
-$$conn = new mysqli($host, $username, $password, $dbname, $port);
-if ($conn->connect_error) { die("DB connection failed: " . $conn->connect_error); }
 
+$conn = new mysqli($host, $username, $password, $dbname, $port);
+if ($conn->connect_error) {
+    die("DB connection failed: " . $conn->connect_error);
+}
 
 // Helper function to create session record
 function createSession($conn, $session_id, $user_id, $user_agent, $ip_address) {
@@ -30,9 +31,8 @@ function logActivity($conn, $user_id, $activity_type, $reference_id = null, $des
     $stmt->close();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'], $_POST['password'])) {
     $email = trim($_POST['email']);
-    $email = strtolower(trim($_POST['email']));
     $password = trim($_POST['password']);
 
     $stmt = $conn->prepare("SELECT user_id, username, email, password_hash, full_name FROM users WHERE email = ?");
