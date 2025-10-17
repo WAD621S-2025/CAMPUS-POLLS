@@ -56,31 +56,51 @@
                     </select>
                 </div>
             </div>
+            
+            <form action="add_event.php" method="POST" class="mb-6 bg-amber-50 dark:bg-gray-900 border-2 border-amber-300 dark:border-amber-600 p-4 rounded-lg">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Add New Event</h3>
+    <div class="space-y-3">
+        <div>
+            <label for="event-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Title</label>
+            <input type="text" name="title" id="event-title" placeholder="Event Title"
+            class="w-full p-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md focus:border-amber-500 focus:outline-none"
+            required>
+        </div>
 
-            <div class="mb-6 bg-amber-50 dark:bg-gray-900 border-2 border-amber-300 dark:border-amber-600 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Add New Event</h3>
-                <div class="space-y-3">
-                    <div>
-                        <label for="event-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Title</label>
-                        <input type="text" id="event-title" placeholder="Event Title" class="w-full p-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md focus:border-amber-500 focus:outline-none">
-                    </div>
+        <div>
+            <label for="event-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Category</label>
+            <select name="category" id="event-category"
+            class="w-full p-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md focus:border-amber-500 focus:outline-none"
+            required>
+                <option value="">Select Category</option>
+                <option value="academic">Academic</option>
+                <option value="social">Social</option>
+                <option value="sports">Sports</option>
+                <option value="workshop">Workshop</option>
+            </select>
+        </div>
 
-                    <div>
-                        <label for="event-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Category</label>
-                        <select id="event-category" class="w-full p-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md focus:border-amber-500 focus:outline-none">
-                            <option value="">Select Category</option>
-                            <option value="academic">Academic</option>
-                            <option value="social">Social</option>
-                            <option value="sports">Sports</option>
-                            <option value="workshop">Workshop</option>
-                        </select>
-                    </div>
-                    
-                    <button class="w-full bg-amber-500 dark:bg-amber-600 text-white py-2 rounded-md hover:bg-amber-600 dark:hover:bg-amber-700 transition shadow font-semibold">
-                        Create Event
-                    </button>
-                </div>
-            </div>
+        <div>
+            <label for="event-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Description</label>
+            <textarea name="description" id="event-description"
+            class="w-full p-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md focus:border-amber-500 focus:outline-none"
+            placeholder="Brief description..." required></textarea>
+        </div>
+
+        <div>
+            <label for="event-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Date & Time</label>
+            <input type="datetime-local" name="event_date" id="event-date"
+            class="w-full p-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md focus:border-amber-500 focus:outline-none"
+            required>
+        </div>
+
+        <button type="submit"
+        class="w-full bg-amber-500 dark:bg-amber-600 text-white py-2 rounded-md hover:bg-amber-600 dark:hover:bg-amber-700 transition shadow font-semibold">
+            Create Event
+        </button>
+    </div>
+</form>
+
                 
             <!-- Events Grid -->
             <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
