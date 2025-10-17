@@ -1,115 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Polls - BUZZ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Campus Polls - BUZZ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body class="bg-amber-50 text-gray-800 flex flex-col min-h-screen relative">
-    <div class="honeycomb-bg"></div>
+    <div class="honeycomb-bg"></div>
 
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg sticky top-0 z-50">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <a href="index.html" class="flex items-center">
-                    <i class="fas fa-university text-2xl text-gray-800 mr-2"></i>
-                    <h1 class="text-xl font-bold text-gray-800">🐝 BUZZ</h1>
-                </a>
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="index.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
-                    <a href="polls.html" class="text-gray-800 font-semibold px-3 py-2 rounded-md text-sm bg-white bg-opacity-30">Polls</a>
-                    <a href="events.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Events</a>
-                    <a href="memes.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
-                    <a href="about.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">About Us</a>
-                </div>
-                <div class="flex items-center">
-                     <a href="login.html" class="bg-gray-800 text-amber-400 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 transition">Login</a>
-                     <a href="profile.html" class="ml-4"><img class="h-8 w-8 rounded-full object-cover border-2 border-gray-800" src="https://placehold.co/100x100/fbbf24/1f2937?text=U" alt="User Avatar"></a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center">
+                    <i class="fas fa-university text-2xl text-gray-800 mr-2"></i>
+                    <h1 class="text-xl font-bold text-gray-800">🐝 BUZZ</h1>
+                </a>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
+                    <a href="polls.html" class="text-gray-800 font-semibold px-3 py-2 rounded-md text-sm bg-white bg-opacity-30">Polls</a>
+                    <a href="events.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Events</a>
+                    <a href="memes.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
+                    <a href="about.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">About Us</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="login.html" class="bg-gray-800 text-amber-400 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 transition">Login</a>
+                    <a href="profile.html" class="ml-4"><img class="h-8 w-8 rounded-full object-cover border-2 border-gray-800" src="https://placehold.co/100x100/fbbf24/1f2937?text=U" alt="User Avatar"></a>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
-         <section id="polls" class="bg-white border-2 border-amber-300 p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">📊 Campus Polls</h2>
-            <div class="mb-6 border-b-2 border-amber-200 pb-6">
-                <h3 class="text-lg font-semibold mb-2 text-gray-800">Create a New Poll</h3>
-                <input type="text" placeholder="Poll question..." class="w-full p-2 border-2 border-amber-300 rounded-md mb-2 focus:border-amber-500 focus:outline-none">
-                <div id="poll-options-container" class="space-y-2">
-                    <input type="text" placeholder="Option 1" class="w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none">
-                    <input type="text" placeholder="Option 2" class="w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none">
-                </div>
-                <button id="add-poll-option" class="mt-2 text-sm text-amber-700 hover:text-amber-800 hover:underline font-semibold">+ Add Option</button>
-                <button class="mt-4 w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-gray-800 font-bold py-2 rounded-md hover:from-yellow-500 hover:to-amber-600 shadow">Submit Poll</button>
-            </div>
-            <div class="space-y-6">
-                <!-- Poll with Voting Options -->
-                <div class="border-2 border-amber-300 p-4 rounded-lg bg-white shadow-md">
-                    <p class="font-semibold text-gray-800 mb-3">🎓 Best study spot on campus?</p>
-                    <div class="mt-2 space-y-2">
-                        <button class="w-full text-left p-2 bg-amber-50 border-2 border-amber-200 rounded-md hover:bg-amber-100 hover:border-amber-400 transition font-medium">📚 The Library</button>
-                        <button class="w-full text-left p-2 bg-amber-50 border-2 border-amber-200 rounded-md hover:bg-amber-100 hover:border-amber-400 transition font-medium">☕ Student Cafe</button>
-                        <button class="w-full text-left p-2 bg-amber-50 border-2 border-amber-200 rounded-md hover:bg-amber-100 hover:border-amber-400 transition font-medium">🔬 The Labs</button>
-                    </div>
-                </div>
-                <!-- Poll with Pie Chart Results -->
-                <div class="border-2 border-amber-300 p-4 rounded-lg bg-white shadow-md">
-                    <p class="font-semibold mb-4 text-gray-800">🍔 Favorite on-campus food shop?</p>
-                    <div class="flex justify-center items-center">
-                         <div class="w-full max-w-xs">
-                             <canvas id="pollChart"></canvas>
-                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
+        <section id="polls" class="bg-white border-2 border-amber-300 p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">📊 Campus Polls</h2>
+            <form action="polls.php" method="POST" id="pollForm" class="mb-6 border-b-2 border-amber-200 pb-6">
+                <h3 class="text-lg font-semibold mb-2 text-gray-800">Create a New Poll</h3>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-inner mt-auto relative z-10">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800">
-            <p>&copy; 2025 BUZZ. All Rights Reserved.</p>
-        </div>
-    </footer>
-    
-    <script>
-        // Initialize pie chart with bee-themed colors
-        const ctx = document.getElementById('pollChart').getContext('2d');
-        const pollChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Pizza Place', 'Burger Joint', 'Salad Bar', 'Coffee Shop'],
-                datasets: [{
-                    data: [30, 25, 20, 25],
-                    backgroundColor: [
-                        '#fbbf24',
-                        '#f59e0b',
-                        '#d97706',
-                        '#b45309'
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    }
-                }
-            }
-        });
-    </script>
-    <script src="script.js"></script>
+                <input type="text" name="question" placeholder="Poll question..." class="w-full p-2 border-2 border-amber-300 rounded-md mb-2 focus:border-amber-500 focus:outline-none" required>
+
+                <div id="poll-options-container" class="space-y-2">
+                    <input type="text" name="options[]" placeholder="Option 1" class="w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none" required>
+                    <input type="text" name="options[]" placeholder="Option 2" class="w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none" required>
+                </div>
+
+                <button id="add-poll-option" type="button" class="mt-2 text-sm text-amber-700 hover:text-amber-800 hover:underline font-semibold">+ Add Option</button>
+
+                <label class="inline-flex items-center mt-4">
+                    <input type="checkbox" name="is_anonymous" value="1" class="form-checkbox">
+                    <span class="ml-2 text-gray-700">Anonymous Poll</span>
+                </label>
+
+                <label class="mt-4 block">
+                    Category: 
+                    <select name="category" class="ml-2 p-1 border-2 border-amber-300 rounded-md focus:border-amber-500">
+                        <option value="academic">Academic</option>
+                        <option value="social">Social</option>
+                        <option value="sports">Sports</option>
+                        <option value="workshop">Workshop</option>
+                    </select>
+                </label>
+
+                <input type="hidden" name="poll_type" value="single" />
+
+                <button type="submit" class="mt-4 w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-gray-800 font-bold py-2 rounded-md hover:from-yellow-500 hover:to-amber-600 shadow">Submit Poll</button>
+
+            </form>
+
+
+            <!-- Example Polls, implement dynamic loading yourself -->
+            <!-- Poll voting UI and results can be populated dynamically as needed -->
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-inner mt-auto relative z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800">
+            <p>&copy; 2025 BUZZ. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('add-poll-option').addEventListener('click', function(e){
+            e.preventDefault();
+            const container = document.getElementById('poll-options-container');
+            const optionCount = container.querySelectorAll('input[name="options[]"]').length + 1;
+            if(optionCount <= 10) {
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.name = 'options[]';
+                newInput.placeholder = `Option ${optionCount}`;
+                newInput.className = 'w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none';
+                container.appendChild(newInput);
+            } else {
+                alert('Maximum 10 options allowed.');
+            }
+        });
+    </script>
 </body>
 </html>
