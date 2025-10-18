@@ -1,16 +1,15 @@
--- Active: 1760544870899@@127.0.0.1@3307@buzz
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Campus Polls - BUZZ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Campus Polls - BUZZ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="bg-amber-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen relative transition-colors duration-300">
@@ -37,8 +36,12 @@
                         <i class="fas fa-moon dark:hidden text-gray-800"></i>
                         <i class="fas fa-sun hidden dark:inline text-yellow-300"></i>
                     </button>
-                    <a href="login.html" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login</a>
-                    <a href="profile.html"><img class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=U" alt="User Avatar"></a>
+                    <!-- Login/Sign Up Link - Hidden when logged in -->
+                    <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up</a>
+                    <!-- User Profile Link - Always visible -->
+                    <a href="user_profile.php" id="profile-link">
+                        <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=P" alt="User Avatar">
+                    </a>
                 </div>
             </div>
         </nav>
@@ -166,6 +169,49 @@
     </footer>
     
     <script>
+        // User session management (in-memory storage)
+        let currentUser = null;
+
+        // Check if user is logged in on page load
+        function checkUserSession() {
+            // This would normally check with your backend/PHP session
+            // For demo purposes, you can simulate login like this:
+            // currentUser = { profilePicture: 'path/to/image.jpg' };
+            
+            // Check if there's a user session from your PHP backend
+            // You'll need to add PHP code to output user data
+            // Example: const userData = <?php echo json_encode($_SESSION['user'] ?? null); ?>;
+            
+            if (currentUser) {
+                updateNavbarForLoggedInUser(currentUser.profilePicture);
+            }
+        }
+
+        // Update navbar when user logs in
+        function updateNavbarForLoggedInUser(profilePictureUrl) {
+            const loginLink = document.getElementById('login-link');
+            const profileAvatar = document.getElementById('profile-avatar');
+            
+            // Hide login link
+            loginLink.classList.add('hidden');
+            
+            // Update profile picture with user's actual image
+            profileAvatar.src = profilePictureUrl;
+        }
+
+        // Function to handle logout (you can call this from your logout button)
+        function handleLogout() {
+            currentUser = null;
+            const loginLink = document.getElementById('login-link');
+            const profileAvatar = document.getElementById('profile-avatar');
+            
+            // Show login link
+            loginLink.classList.remove('hidden');
+            
+            // Reset profile picture to placeholder
+            profileAvatar.src = 'https://placehold.co/100x100/fbbf24/1f2937?text=P';
+        }
+
         // Dark mode toggle
         const themeToggle = document.getElementById('theme-toggle');
         const html = document.documentElement;
@@ -186,6 +232,9 @@
 
         // Animate elements on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Check user session on page load
+            checkUserSession();
+            
             setTimeout(() => {
                 document.getElementById('hero').classList.add('animate-fade-in-up');
             }, 100);

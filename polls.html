@@ -1,108 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Campus Polls - BUZZ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Campus Polls - BUZZ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.poll-progress').forEach(bar => {
+                const progressValue = bar.parentElement.getAttribute('data-progress');
+                if (progressValue) {
+                    bar.style.width = progressValue + '%';
+                }
+            });
+        });
+    </script>
+    <style>
+        /* This is crucial to prevent the poll-result's background style from affecting the unvoted options */
+        .poll-result-wrapper .block {
+            padding: 0; /* Remove padding */
+            border-radius: 0; /* Remove border-radius */
+            background: none; /* Remove background */
+            position: static;
+        }
+
+        /* Add card hover effect for consistency */
+        .card-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 </head>
-<body class="bg-amber-50 text-gray-800 flex flex-col min-h-screen relative">
-    <div class="honeycomb-bg"></div>
+<body class="bg-amber-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen relative transition-colors duration-300 font-inter">
+    <div class="honeycomb-bg"></div>
 
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg sticky top-0 z-50">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <a href="index.html" class="flex items-center">
-                    <i class="fas fa-university text-2xl text-gray-800 mr-2"></i>
-                    <h1 class="text-xl font-bold text-gray-800">🐝 BUZZ</h1>
-                </a>
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="index.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
-                    <a href="polls.html" class="text-gray-800 font-semibold px-3 py-2 rounded-md text-sm bg-white bg-opacity-30">Polls</a>
-                    <a href="events.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Events</a>
-                    <a href="memes.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
-                    <a href="about.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">About Us</a>
-                </div>
-                <div class="flex items-center">
-                    <a href="login.html" class="bg-gray-800 text-amber-400 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 transition">Login</a>
-                    <a href="profile.html" class="ml-4"><img class="h-8 w-8 rounded-full object-cover border-2 border-gray-800" src="https://placehold.co/100x100/fbbf24/1f2937?text=U" alt="User Avatar"></a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <header class="bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 shadow-lg sticky top-0 z-50 transition-colors duration-300">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center">
+                    <i class="fas fa-university text-2xl text-gray-800 dark:text-gray-100 mr-2"></i>
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">🐝 BUZZ</h1>
+                </a>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
+                    <a href="polls.html" class="text-gray-800 dark:text-gray-100 font-semibold px-3 py-2 rounded-md text-sm bg-white dark:bg-gray-800 bg-opacity-30">Polls</a>
+                    <a href="events.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Events</a>
+                    <a href="memes.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
+                    <a href="about.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">About Us</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="theme-toggle p-2 rounded-md bg-white dark:bg-gray-800 bg-opacity-30 hover:bg-opacity-50 transition" title="Toggle Dark Mode">
+                        <i class="fas fa-moon dark:hidden text-gray-800"></i>
+                        <i class="fas fa-sun hidden dark:inline text-yellow-300"></i>
+                    </button>
+                    <!-- Login/Sign Up Link - Hidden when logged in -->
+                    <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up</a>
+                    <!-- User Profile Link - Always visible -->
+                    <a href="user_profile.php" id="profile-link">
+                        <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=P" alt="User Avatar">
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
-        <section id="polls" class="bg-white border-2 border-amber-300 p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">📊 Campus Polls</h2>
-            <form action="polls.php" method="POST" id="pollForm" class="mb-6 border-b-2 border-amber-200 pb-6">
-                <h3 class="text-lg font-semibold mb-2 text-gray-800">Create a New Poll</h3>
+    <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
+        <h2 class="text-3xl font-extrabold mb-8 text-gray-900 dark:text-gray-50 text-center">
+            <i class="fas fa-poll-h mr-2 text-amber-500"></i> Campus Buzz Polls
+        </h2>
 
-                <input type="text" name="question" placeholder="Poll question..." class="w-full p-2 border-2 border-amber-300 rounded-md mb-2 focus:border-amber-500 focus:outline-none" required>
+        <div class="space-y-8">
+            
+            <section id="create-poll" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-amber-500 dark:border-yellow-500 transition-colors duration-300 card-hover">
+                <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-50 border-b pb-2 border-amber-200 dark:border-gray-700">
+                    <i class="fas fa-plus-circle mr-2 text-amber-500"></i> Create a New Poll
+                </h3>
+                
+                <form action="api/polls.php" method="POST" id="pollForm" class="space-y-4">
+                    <div>
+                        <input type="text" name="question" placeholder="Poll question (e.g., Which department is the best?)" 
+                               class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100" required>
+                    </div>
 
-                <div id="poll-options-container" class="space-y-2">
-                    <input type="text" name="options[]" placeholder="Option 1" class="w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none" required>
-                    <input type="text" name="options[]" placeholder="Option 2" class="w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none" required>
-                </div>
+                    <div id="poll-options-container" class="space-y-2">
+                        <input type="text" name="options[]" placeholder="Option 1" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100" required>
+                        <input type="text" name="options[]" placeholder="Option 2" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100" required>
+                    </div>
 
-                <button id="add-poll-option" type="button" class="mt-2 text-sm text-amber-700 hover:text-amber-800 hover:underline font-semibold">+ Add Option</button>
+                    <button id="add-poll-option" type="button" class="text-sm font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition">
+                        <i class="fas fa-plus mr-1"></i> Add Another Option
+                    </button>
 
-                <label class="inline-flex items-center mt-4">
-                    <input type="checkbox" name="is_anonymous" value="1" class="form-checkbox">
-                    <span class="ml-2 text-gray-700">Anonymous Poll</span>
-                </label>
+                    <div class="pt-4 border-t border-amber-100 dark:border-gray-700 space-y-3">
+                        
+                        <label class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <input type="checkbox" name="is_anonymous" value="1" class="form-checkbox h-4 w-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500">
+                            <span class="ml-2">Anonymous Poll</span>
+                        </label>
 
-                <label class="mt-4 block">
-                    Category: 
-                    <select name="category" class="ml-2 p-1 border-2 border-amber-300 rounded-md focus:border-amber-500">
-                        <option value="academic">Academic</option>
-                        <option value="social">Social</option>
-                        <option value="sports">Sports</option>
-                        <option value="workshop">Workshop</option>
-                    </select>
-                </label>
+                        <label for="poll-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Category: 
+                            <select name="category" id="poll-category" class="ml-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-100 focus:ring-amber-500 focus:border-amber-500">
+                                <option value="academic">Academic</option>
+                                <option value="social">Social</option>
+                                <option value="sports">Sports</option>
+                                <option value="workshop">Workshop</option>
+                            </select>
+                        </label>
+                    </div>
 
-                <input type="hidden" name="poll_type" value="single" />
+                    <input type="hidden" name="poll_type" value="single" />
 
-                <button type="submit" class="mt-4 w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-gray-800 font-bold py-2 rounded-md hover:from-yellow-500 hover:to-amber-600 shadow">Submit Poll</button>
+                    <button type="submit" class="w-full bg-amber-600 text-white font-bold py-3 rounded-lg hover:bg-amber-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Poll
+                    </button>
+                </form>
+            </section>
 
-            </form>
+            <section id="poll-feed" class="space-y-6">
+                <div class="flex justify-between items-center pb-2 border-b border-amber-300 dark:border-gray-700">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-50">
+                        <i class="fas fa-list-ul mr-2 text-amber-500"></i> Active Polls
+                    </h3>
+                    <div class="relative">
+                        <label for="sort-polls" class="sr-only">Sort Polls By</label> 
+                        <select id="sort-polls" class="p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-100 text-sm">
+                            <option>Newest First</option>
+                            <option>Most Voted</option>
+                            <option>Ending Soon</option>
+                        </select>
+                    </div>
+                </div>
 
+                <div id="polls-container">
+                    <!-- Polls will be loaded here dynamically -->
+                    <div class="text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">Loading polls...</p>
+                    </div>
+                </div>
 
-            <!-- Example Polls, implement dynamic loading yourself -->
-            <!-- Poll voting UI and results can be populated dynamically as needed -->
-        </section>
-    </main>
+                <div class="text-center p-4">
+                    <button class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">Load More Polls</button>
+                </div>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-inner mt-auto relative z-10">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800">
-            <p>&copy; 2025 BUZZ. All Rights Reserved.</p>
-        </div>
-    </footer>
+            </section>
+        </div>
+    </main>
 
-    <script>
-        document.getElementById('add-poll-option').addEventListener('click', function(e){
-            e.preventDefault();
-            const container = document.getElementById('poll-options-container');
-            const optionCount = container.querySelectorAll('input[name="options[]"]').length + 1;
-            if(optionCount <= 10) {
-                const newInput = document.createElement('input');
-                newInput.type = 'text';
-                newInput.name = 'options[]';
-                newInput.placeholder = `Option ${optionCount}`;
-                newInput.className = 'w-full p-2 border-2 border-amber-300 rounded-md focus:border-amber-500 focus:outline-none';
-                container.appendChild(newInput);
-            } else {
-                alert('Maximum 10 options allowed.');
-            }
-        });
-    </script>
+    <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 shadow-inner mt-auto relative z-10 transition-colors duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800 dark:text-gray-100">
+            <p>&copy; 2025 BUZZ. All Rights Reserved.</p>
+             <div class="flex justify-center space-x-4 mt-2">
+                <a href="#" class="hover:text-white transition" title="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="hover:text-white transition" title="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-white transition" title="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // User session management (in-memory storage)
+        let currentUser = null;
+
+        // Check if user is logged in on page load
+        function checkUserSession() {
+            // This would normally check with your backend/PHP session
+            // For demo purposes, you can simulate login like this:
+            // currentUser = { profilePicture: 'path/to/image.jpg' };
+            
+            // Check if there's a user session from your PHP backend
+            // You'll need to add PHP code to output user data
+            // Example: const userData = <?php echo json_encode($_SESSION['user'] ?? null); ?>;
+            
+            if (currentUser) {
+                updateNavbarForLoggedInUser(currentUser.profilePicture);
+            }
+        }
+
+        // Update navbar when user logs in
+        function updateNavbarForLoggedInUser(profilePictureUrl) {
+            const loginLink = document.getElementById('login-link');
+            const profileAvatar = document.getElementById('profile-avatar');
+            
+            // Hide login link
+            loginLink.classList.add('hidden');
+            
+            // Update profile picture with user's actual image
+            profileAvatar.src = profilePictureUrl;
+        }
+
+        // Function to handle logout (you can call this from your logout button)
+        function handleLogout() {
+            currentUser = null;
+            const loginLink = document.getElementById('login-link');
+            const profileAvatar = document.getElementById('profile-avatar');
+            
+            // Show login link
+            loginLink.classList.remove('hidden');
+            
+            // Reset profile picture to placeholder
+            profileAvatar.src = 'https://placehold.co/100x100/fbbf24/1f2937?text=P';
+        }
+
+        // Poll Option Adder
+        document.getElementById('add-poll-option').addEventListener('click', function(e){
+            e.preventDefault();
+            const container = document.getElementById('poll-options-container');
+            const optionCount = container.querySelectorAll('input[name="options[]"]').length + 1;
+            if(optionCount <= 10) {
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.name = 'options[]';
+                newInput.placeholder = `Option ${optionCount}`;
+                newInput.className = 'w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100';
+                container.appendChild(newInput);
+            } else {
+                alert('Maximum 10 options allowed.');
+            }
+        });
+
+        // Dark mode toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        
+        if (currentTheme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Check user session on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserSession();
+            loadPolls();
+        });
+
+        // Function to load polls from database
+        function loadPolls() {
+            fetch('api/polls.php?api=1')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayPolls(data.polls);
+                    } else {
+                        document.getElementById('polls-container').innerHTML = 
+                            '<div class="text-center py-8"><p class="text-red-600">Error loading polls: ' + data.message + '</p></div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('polls-container').innerHTML = 
+                        '<div class="text-center py-8"><p class="text-red-600">Failed to load polls. Please try again.</p></div>';
+                });
+        }
+
+        // Function to display polls
+        function displayPolls(polls) {
+            const container = document.getElementById('polls-container');
+            
+            if (polls.length === 0) {
+                container.innerHTML = '<div class="text-center py-8"><p class="text-gray-600 dark:text-gray-400">No active polls yet. Create one above!</p></div>';
+                return;
+            }
+
+            const categoryColors = {
+                'academic': 'blue',
+                'social': 'red',
+                'sports': 'green',
+                'workshop': 'purple'
+            };
+
+            container.innerHTML = polls.map(poll => {
+                const color = categoryColors[poll.category] || 'gray';
+                const totalVotes = poll.options.reduce((sum, opt) => sum + parseInt(opt.vote_count || 0), 0);
+                
+                return `
+                    <div class="poll-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-${color}-500 transition-colors duration-300 card-hover">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-xl font-semibold text-gray-900 dark:text-gray-50">${escapeHtml(poll.question)}</h4>
+                            <span class="text-xs font-medium text-white bg-${color}-500 px-3 py-1 rounded-full shadow-md">${poll.category}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Posted by: ${poll.is_anonymous ? 'Anonymous' : 'User'}</p>
+                        
+                        <form class="space-y-3 poll-vote-form" data-poll-id="${poll.poll_id}">
+                            ${poll.options.map(option => `
+                                <label class="block">
+                                    <input type="radio" name="vote_option_${poll.poll_id}" value="${option.option_id}" class="form-radio h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300 font-medium">${escapeHtml(option.option_text)}</span>
+                                </label>
+                            `).join('')}
+                            <button type="submit" class="mt-4 w-full bg-amber-500 text-white font-semibold py-2 rounded-lg hover:bg-amber-600 transition shadow">Vote</button>
+                        </form>
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-3 border-t pt-2">
+                            <span>Total Votes: ${totalVotes}</span>
+                            <span>Status: Active</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
 </body>
 </html>

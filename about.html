@@ -28,8 +28,13 @@
                     <a href="about.html" class="text-gray-800 font-semibold px-3 py-2 rounded-md text-sm bg-white bg-opacity-30">About Us</a>
                 </div>
                 <div class="flex items-center">
-                     <a href="login.html" class="bg-gray-800 text-amber-400 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 transition">Login</a>
-                     <a href="profile.html" class="ml-4"><img class="h-8 w-8 rounded-full object-cover border-2 border-gray-800" src="https://placehold.co/100x100/fbbf24/1f2937?text=U" alt="User Avatar"></a>
+                  <!-- Login/Sign Up Link - Hidden when logged in -->
+                    <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up
+                    </a>
+                    <!-- User Profile Link - Always visible -->
+                    <a href="user_profile.php" id="profile-link">
+                        <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=P" alt="User Avatar">
+                    </a>
                 </div>
             </div>
         </nav>
