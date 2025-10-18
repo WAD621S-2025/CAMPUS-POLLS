@@ -1,5 +1,5 @@
 <?php
-session_start();
+require 'includes/session_check.php';
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.html');
     exit();

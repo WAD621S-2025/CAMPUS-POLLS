@@ -128,7 +128,7 @@
                     </button>
                     <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up</a>
                     <a href="user_profile.php" id="profile-link">
-                        <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=P" alt="User Avatar">
+                        <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="<?php echo htmlspecialchars($profile_image_path); ?>" alt="User Avatar">
                     </a>
                 </div>
             </div>
@@ -189,7 +189,8 @@
                 </div>
             </div>
 
-            <div id="memes-grid" class="space-y-6"></div>
+            <div id="memes-grid" class="space-y-6">
+                </div>
 
             <div class="text-center p-4">
                 <button id="load-more-memes" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">Load More Memes</button>
@@ -209,354 +210,456 @@
     </footer>
 
 <script>
-let memesData = [];
-let memesLoaded = 0;
-const MEMES_PER_LOAD = 5;
+    let memesData = [];
+    let memesLoaded = 0;
+    const MEMES_PER_LOAD = 5;
 
-function showNotification(message, type = 'success') {
-    const notification = document.getElementById('notification');
-    const notificationText = document.getElementById('notification-text');
-    notificationText.textContent = message;
-    notification.style.backgroundColor = type === 'success' ? '#f59e0b' : '#ef4444';
-    notification.classList.add('show');
-    setTimeout(() => notification.classList.remove('show'), 3000);
-}
+    // --- Utility Functions ---
 
-async function loadMemesFromAPI() {
-    try {
-        const response = await fetch('/CAMPUS-POLLS/api/get_memes.php');
-        const data = await response.json();
-        if (data.success) {
-            memesData = data.memes;
-            memesLoaded = 0;
-            renderMemes(true);
-        } else {
-            showNotification(data.message || 'Failed to load memes', 'error');
+    function setupThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        
+        if (currentTheme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
         }
-    } catch (error) {
-        showNotification('Network error loading memes', 'error');
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
     }
-}
 
-function createCommentHTML(comment) {
-    let profileImageUrl = comment.profile_image || 'https://placehold.co/32x32/f59e0b/1f2937?text=U';
-    if (profileImageUrl && !profileImageUrl.startsWith('http')) {
-        profileImageUrl = '/CAMPUS-POLLS/' + profileImageUrl;
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        notificationText.textContent = message;
+        notification.style.backgroundColor = type === 'success' ? '#f59e0b' : '#ef4444';
+        notification.classList.add('show');
+        setTimeout(() => notification.classList.remove('show'), 3000);
     }
-    return `
-        <div class="comment-item flex items-start space-x-2 text-sm">
-            <img src="${profileImageUrl}" 
-                 class="w-8 h-8 rounded-full flex-shrink-0" 
-                 alt="${comment.username}">
-            <div class="flex-1 min-w-0">
-                <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2">
-                    <p class="comment-username font-semibold text-gray-900 dark:text-gray-50">${comment.username}</p>
-                    <p class="comment-text text-gray-700 dark:text-gray-300">${comment.text}</p>
-                </div>
-                <div class="comment-actions flex items-center space-x-4 mt-1 ml-3 text-xs text-gray-500 dark:text-gray-400">
-                    <span>${comment.created_at || 'Just now'}</span>
-                    <button class="hover:text-gray-700 dark:hover:text-gray-300">${comment.likes || 0} likes</button>
-                    <button class="hover:text-gray-700 dark:hover:text-gray-300">Reply</button>
-                </div>
-            </div>
-        </div>
-    `;
-}
 
-function renderMemes(reset = false) {
-    const container = document.getElementById('memes-grid');
-    if(reset) container.innerHTML = '';
+    function createFloatingHearts(button) {
+        const rect = button.getBoundingClientRect();
 
-    const memesToShow = memesData.slice(memesLoaded, memesLoaded + MEMES_PER_LOAD);
-    memesToShow.forEach(meme => {
-        const card = document.createElement('div');
-        card.className = 'meme-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-300 p-4 card-hover';
-
-        const visibleComments = (meme.comments || []).slice(0, 2);
-        const hasMoreComments = (meme.comments || []).length > 2;
-
-        const posterName = meme.username || 'Anonymous';
-
-        let memeProfileImgUrl = meme.profile_image || `https://placehold.co/40x40/f59e0b/1f2937?text=${posterName[0]}`;
-        if (memeProfileImgUrl && !memeProfileImgUrl.startsWith('http')) {
-            memeProfileImgUrl = '/CAMPUS-POLLS/' + memeProfileImgUrl;
+        for(let i=0; i<3; i++) {
+            setTimeout(() => {
+                const heart = document.createElement('i');
+                heart.className = 'fas fa-heart floating-heart';
+                // Adjust position for a slight horizontal spread
+                heart.style.left = `${rect.left + (rect.width / 2) + Math.random() * 30 - 15}px`;
+                heart.style.top = `${rect.top}px`;
+                heart.style.fontSize = `${15 + Math.random() * 10}px`;
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 1500);
+            }, i * 100);
         }
-
-        card.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center space-x-3">
-                    <img src="${memeProfileImgUrl}" class="w-10 h-10 rounded-full border-2 border-amber-400" alt="${posterName}" />
-                    <div>
-                        <p class="font-semibold text-sm text-gray-900 dark:text-gray-50">${posterName}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${meme.created_at || ''}</p>
-                    </div>
-                </div>
-                <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" title="Options">
-                    <i class="fas fa-ellipsis-h"></i>
-                </button>
-            </div>
-
-            <img src="${meme.image_url}" alt="Meme" class="w-full h-auto object-cover rounded-lg mb-3" />
-
-            <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-4">
-                    <button class="like-btn ${meme.liked ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} hover:text-red-500 transition-colors text-2xl" title="Like" data-id="${meme.meme_id}">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Comment" onclick="focusCommentInput(${meme.meme_id})">
-                        <i class="far fa-comment"></i>
-                    </button>
-                    <button class="share-btn text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Share" data-id="${meme.meme_id}">
-                        <i class="far fa-paper-plane"></i>
-                    </button>
-                </div>
-                <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Save">
-                    <i class="far fa-bookmark"></i>
-                </button>
-            </div>
-
-            <div class="like-count-display mb-3">
-                <p class="font-semibold text-sm text-gray-900 dark:text-gray-50"><span class="like-count">${meme.likes_count || 0}</span> likes</p>
-            </div>
-
-            <div class="text-sm mb-3">
-                <span class="font-semibold text-gray-900 dark:text-gray-50">${posterName}</span>
-                <span class="text-gray-700 dark:text-gray-300 ml-2">${meme.caption || ''}</span>
-            </div>
-
-            ${hasMoreComments ? `<button class="view-all-comments text-sm text-gray-500 dark:text-gray-400 mb-3" onclick="toggleAllComments(${meme.meme_id})">View all ${(meme.comments || []).length} comments</button>` : ''}
-
-            <div class="comments-container space-y-2 mb-3" id="comments-${meme.meme_id}">
-                ${visibleComments.map(c => createCommentHTML(c)).join('')}
-                ${hasMoreComments ? `<div class="hidden-comments hidden space-y-2">${(meme.comments || []).slice(2).map(c => createCommentHTML(c)).join('')}</div>` : ''}
-            </div>
-
-            <div class="flex items-center space-x-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <img src="https://placehold.co/32x32/3b82f6/ffffff?text=U" class="w-8 h-8 rounded-full" alt="Your avatar" />
-                <input type="text" id="comment-input-${meme.meme_id}" placeholder="Add a comment..." class="flex-1 bg-transparent text-sm focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400" data-id="${meme.meme_id}" />
-                <button class="add-comment-btn text-amber-500 font-semibold text-sm hover:text-amber-600 disabled:opacity-50 disabled:cursor-not-allowed" data-id="${meme.meme_id}" disabled>Post</button>
-            </div>
-        `;
-        setupCardEventListeners(card, meme);
-        container.appendChild(card);
-    });
-    memesLoaded += memesToShow.length;
-}
-
-function setupCardEventListeners(card, meme) {
-    const likeBtn = card.querySelector('.like-btn');
-    likeBtn.addEventListener('click', e => handleLike(e, meme.meme_id));
-
-    const shareBtn = card.querySelector('.share-btn');
-    shareBtn.addEventListener('click', e => handleShare(e, meme.meme_id));
-
-    const commentInput = card.querySelector(`#comment-input-${meme.meme_id}`);
-    const addCommentBtn = card.querySelector(`.add-comment-btn[data-id="${meme.meme_id}"]`);
-    commentInput.addEventListener('input', e => {
-        addCommentBtn.disabled = e.target.value.trim() === '';
-    });
-    commentInput.addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !addCommentBtn.disabled) {
-            handleAddComment(meme.meme_id);
-        }
-    });
-    addCommentBtn.addEventListener('click', () => handleAddComment(meme.meme_id));
-}
-
-function focusCommentInput(memeId) {
-    const input = document.getElementById(`comment-input-${memeId}`);
-    input.focus();
-}
-
-function toggleAllComments(memeId) {
-    const container = document.getElementById(`comments-${memeId}`);
-    const hiddenComments = container.querySelector('.hidden-comments');
-    const viewAllBtn = container.parentElement.querySelector('.view-all-comments');
-
-    if(hiddenComments.classList.contains('hidden')) {
-        hiddenComments.classList.remove('hidden');
-        viewAllBtn.textContent = 'Show less';
-    } else {
-        hiddenComments.classList.add('hidden');
-        const meme = memesData.find(m => m.meme_id === memeId);
-        viewAllBtn.textContent = `View all ${meme.comments.length} comments`;
     }
-}
 
-async function handleLike(e, memeId) {
-    const meme = memesData.find(m => m.meme_id === memeId);
-    const button = e.currentTarget;
-    const icon = button.querySelector('i');
-    const card = button.closest('.meme-card');
-    const countSpan = card.querySelector('.like-count');
+    // --- API & Rendering Logic ---
 
-    try {
-        const formData = new FormData();
-        formData.append('meme_id', memeId);
-
-        const response = await fetch('/CAMPUS-POLLS/api/meme_like.php', { method: 'POST', body: formData });
-        const data = await response.json();
-
-        if(data.success) {
-            meme.liked = data.liked;
-            meme.likes_count = data.likes_count;
-
-            if(meme.liked) {
-                button.classList.add('text-red-500');
-                button.classList.remove('text-gray-700', 'dark:text-gray-300');
-                icon.classList.add('like-animation');
-                createFloatingHearts(button);
-            } else {
-                button.classList.remove('text-red-500');
-                button.classList.add('text-gray-700', 'dark:text-gray-300');
-            }
-
-            countSpan.textContent = meme.likes_count;
-            setTimeout(() => icon.classList.remove('like-animation'), 500);
-        } else {
-            showNotification(data.message || 'Failed to update like', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Failed to update like', 'error');
-    }
-}
-
-function createFloatingHearts(button) {
-    const rect = button.getBoundingClientRect();
-
-    for(let i=0; i<3; i++) {
-        setTimeout(() => {
-            const heart = document.createElement('i');
-            heart.className = 'fas fa-heart floating-heart';
-            heart.style.left = `${rect.left + Math.random() * 30}px`;
-            heart.style.top = `${rect.top}px`;
-            heart.style.fontSize = `${15 + Math.random() * 10}px`;
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 1500);
-        }, i * 100);
-    }
-}
-
-function handleShare(e, memeId) {
-    navigator.clipboard.writeText(`http://yourcampusbuzz.com/memes/${memeId}`);
-    showNotification('Link copied to clipboard!', 'success');
-}
-
-async function handleAddComment(memeId) {
-    const meme = memesData.find(m => m.meme_id === memeId);
-    const input = document.getElementById(`comment-input-${memeId}`);
-    const commentText = input.value.trim();
-    if(!commentText) return;
-
-    try {
-        const formData = new FormData();
-        formData.append('meme_id', memeId);
-        formData.append('comment_text', commentText);
-
-        const response = await fetch('/CAMPUS-POLLS/api/meme_comment.php', { method:'POST', body: formData });
-        const data = await response.json();
-
-        if(data.success) {
-            const newComment = {
-                id: data.comment_id || Date.now(),
-                username: data.username,
-                profile_image: data.profile_image,
-                text: commentText,
-                likes: 0,
-                time: data.time || 'Just now'
-            };
-
-            meme.comments.push(newComment);
-
-            const container = document.getElementById(`comments-${memeId}`);
-            const hiddenComments = container.querySelector('.hidden-comments');
-            if(hiddenComments) {
-                hiddenComments.insertAdjacentHTML('beforeend', createCommentHTML(newComment));
-            } else {
-                container.insertAdjacentHTML('beforeend', createCommentHTML(newComment));
-            }
-
-            input.value = '';
-            const addCommentBtn = document.querySelector(`.add-comment-btn[data-id="${memeId}"]`);
-            if(addCommentBtn) addCommentBtn.disabled = true;
-
-            showNotification('Comment posted!', 'success');
-        } else {
-            showNotification(data.message || 'Failed to post comment', 'error');
-        }
-    } catch(error) {
-        console.error('Error:', error);
-        showNotification('Failed to post comment', 'error');
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('meme-upload');
-    const previewContainer = document.getElementById('preview-container');
-    const previewImg = document.getElementById('meme-preview');
-    const uploadBtn = document.getElementById('upload-btn');
-
-    fileInput.addEventListener('change', e => {
-        const file = e.target.files[0];
-        if(file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                previewImg.src = e.target.result;
-                previewContainer.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        } else {
-            previewContainer.classList.add('hidden');
-            previewImg.src = '';
-        }
-    });
-
-    uploadBtn.addEventListener('click', async () => {
-        const caption = document.getElementById('meme-caption').value.trim();
-        const file = fileInput.files[0];
-
-        if(!file) {
-            showNotification('Please select an image to upload', 'error');
-            return;
-        }
-        if(!caption) {
-            showNotification('Please enter a caption', 'error');
-            return;
-        }
-
-        uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
-
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('caption', caption);
+    async function loadMemesFromAPI() {
+        // Show loading indicator
+        const container = document.getElementById('memes-grid');
+        container.innerHTML = `<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i><p class="mt-2 text-gray-500 dark:text-gray-400">Loading memes...</p></div>`;
 
         try {
-            const response = await fetch('/CAMPUS-POLLS/api/upload_meme.php', { method: 'POST', body: formData });
+            // Include parameters for pagination/sorting if needed, but for now, just fetch all
+            const response = await fetch('/CAMPUS-POLLS/api/get_memes.php');
+            const data = await response.json();
+            
+            if (data.success) {
+                memesData = data.memes.map(meme => ({
+                    ...meme,
+                    meme_id: parseInt(meme.meme_id),
+                    likes_count: parseInt(meme.likes_count) || 0,
+                    liked: parseInt(meme.liked) === 1,
+                    comments: meme.comments || []
+                }));
+                memesLoaded = 0;
+                renderMemes(true);
+            } else {
+                showNotification(data.message || 'Failed to load memes', 'error');
+                container.innerHTML = `<div class="text-center py-8 text-red-500 dark:text-red-400"><i class="fas fa-exclamation-circle text-4xl"></i><p class="mt-2">Failed to load memes: ${data.message || 'Unknown error'}</p></div>`;
+            }
+        } catch (error) {
+            console.error('Network Error:', error);
+            showNotification('Network error loading memes', 'error');
+            const container = document.getElementById('memes-grid');
+            container.innerHTML = `<div class="text-center py-8 text-red-500 dark:text-red-400"><i class="fas fa-exclamation-circle text-4xl"></i><p class="mt-2">Network error. Please check the API endpoint.</p></div>`;
+        }
+    }
+
+    function createCommentHTML(comment) {
+        let profileImageUrl = comment.profile_image || 'https://placehold.co/32x32/f59e0b/1f2937?text=U';
+        if (profileImageUrl && !profileImageUrl.startsWith('http') && !profileImageUrl.startsWith('/')) {
+            profileImageUrl = '/CAMPUS-POLLS/' + profileImageUrl;
+        }
+        return `
+            <div class="comment-item flex items-start space-x-2 text-sm">
+                <img src="${profileImageUrl}" 
+                     class="w-8 h-8 rounded-full flex-shrink-0" 
+                     alt="${comment.username}">
+                <div class="flex-1 min-w-0">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2">
+                        <p class="comment-username font-semibold text-gray-900 dark:text-gray-50">${comment.username}</p>
+                        <p class="comment-text text-gray-700 dark:text-gray-300">${comment.text}</p>
+                    </div>
+                    <div class="comment-actions flex items-center space-x-4 mt-1 ml-3 text-xs text-gray-500 dark:text-gray-400">
+                        <span>${comment.created_at || 'Just now'}</span>
+                        <button class="hover:text-gray-700 dark:hover:text-gray-300">${comment.likes || 0} likes</button>
+                        <button class="hover:text-gray-700 dark:hover:text-gray-300">Reply</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMemes(reset = false) {
+        const container = document.getElementById('memes-grid');
+        const loadMoreBtn = document.getElementById('load-more-memes');
+        
+        if (reset) {
+            container.innerHTML = '';
+        }
+
+        const startIndex = memesLoaded;
+        const endIndex = Math.min(memesData.length, memesLoaded + MEMES_PER_LOAD);
+        const memesToShow = memesData.slice(startIndex, endIndex);
+
+        memesToShow.forEach(meme => {
+            const card = document.createElement('div');
+            card.className = 'meme-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-300 p-4 card-hover';
+
+            const visibleComments = (meme.comments || []).slice(0, 2);
+            const hasMoreComments = (meme.comments || []).length > 2;
+            const posterName = meme.username || 'Anonymous';
+
+            let memeProfileImgUrl = meme.profile_image || `https://placehold.co/40x40/f59e0b/1f2937?text=${posterName[0]}`;
+            if (memeProfileImgUrl && !memeProfileImgUrl.startsWith('http') && !memeProfileImgUrl.startsWith('/')) {
+                memeProfileImgUrl = '/CAMPUS-POLLS/' + memeProfileImgUrl;
+            }
+
+            let memeImageUrl = meme.image_url;
+            if (memeImageUrl && !memeImageUrl.startsWith('http') && !memeImageUrl.startsWith('/')) {
+                memeImageUrl = '/CAMPUS-POLLS/' + memeImageUrl;
+            }
+
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-3">
+                        <img src="${memeProfileImgUrl}" class="w-10 h-10 rounded-full border-2 border-amber-400" alt="${posterName}" />
+                        <div>
+                            <p class="font-semibold text-sm text-gray-900 dark:text-gray-50">${posterName}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${meme.created_at || ''}</p>
+                        </div>
+                    </div>
+                    <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" title="Options">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+
+                <img src="${memeImageUrl}" alt="Meme" class="w-full h-auto object-cover rounded-lg mb-3" />
+
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-4">
+                        <button class="like-btn ${meme.liked ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} hover:text-red-500 transition-colors text-2xl" title="Like" data-id="${meme.meme_id}">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Comment" onclick="focusCommentInput(${meme.meme_id})">
+                            <i class="far fa-comment"></i>
+                        </button>
+                        <button class="share-btn text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Share" data-id="${meme.meme_id}">
+                            <i class="far fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Save">
+                        <i class="far fa-bookmark"></i>
+                    </button>
+                </div>
+
+                <div class="like-count-display mb-3">
+                    <p class="font-semibold text-sm text-gray-900 dark:text-gray-50"><span class="like-count">${meme.likes_count || 0}</span> likes</p>
+                </div>
+
+                <div class="text-sm mb-3">
+                    <span class="font-semibold text-gray-900 dark:text-gray-50">${posterName}</span>
+                    <span class="text-gray-700 dark:text-gray-300 ml-2">${meme.caption || ''}</span>
+                </div>
+
+                ${hasMoreComments ? `<button class="view-all-comments text-sm text-gray-500 dark:text-gray-400 mb-3" onclick="toggleAllComments(${meme.meme_id})">View all ${(meme.comments || []).length} comments</button>` : ''}
+
+                <div class="comments-container space-y-2 mb-3" id="comments-${meme.meme_id}">
+                    ${visibleComments.map(c => createCommentHTML(c)).join('')}
+                    ${hasMoreComments ? `<div class="hidden-comments hidden space-y-2">${(meme.comments || []).slice(2).map(c => createCommentHTML(c)).join('')}</div>` : ''}
+                </div>
+
+                <div class="flex items-center space-x-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                    <img src="https://placehold.co/32x32/3b82f6/ffffff?text=U" class="w-8 h-8 rounded-full" alt="Your avatar" />
+                    <input type="text" id="comment-input-${meme.meme_id}" placeholder="Add a comment..." class="flex-1 bg-transparent text-sm focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400" data-id="${meme.meme_id}" />
+                    <button class="add-comment-btn text-amber-500 font-semibold text-sm hover:text-amber-600 disabled:opacity-50 disabled:cursor-not-allowed" data-id="${meme.meme_id}" disabled>Post</button>
+                </div>
+            `;
+            container.appendChild(card);
+            setupCardEventListeners(card, meme);
+        });
+
+        memesLoaded = endIndex;
+        
+        // Update Load More button visibility
+        if (memesLoaded >= memesData.length) {
+            loadMoreBtn.classList.add('hidden');
+        } else {
+            loadMoreBtn.classList.remove('hidden');
+        }
+
+        if (reset && memesData.length === 0) {
+            container.innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-gray-400"><i class="fas fa-box-open text-4xl"></i><p class="mt-2">No memes posted yet. Be the first!</p></div>`;
+        }
+    }
+    
+    // The rest of the event setup functions remain as provided
+    function setupCardEventListeners(card, meme) {
+        const likeBtn = card.querySelector('.like-btn');
+        likeBtn.addEventListener('click', e => handleLike(e, meme.meme_id));
+
+        const shareBtn = card.querySelector('.share-btn');
+        shareBtn.addEventListener('click', e => handleShare(e, meme.meme_id));
+
+        const commentInput = card.querySelector(`#comment-input-${meme.meme_id}`);
+        const addCommentBtn = card.querySelector(`.add-comment-btn[data-id="${meme.meme_id}"]`);
+        
+        if (commentInput && addCommentBtn) {
+            commentInput.addEventListener('input', e => {
+                addCommentBtn.disabled = e.target.value.trim() === '';
+            });
+            commentInput.addEventListener('keypress', e => {
+                if (e.key === 'Enter' && !addCommentBtn.disabled) {
+                    handleAddComment(meme.meme_id);
+                }
+            });
+            addCommentBtn.addEventListener('click', () => handleAddComment(meme.meme_id));
+        }
+    }
+
+    function focusCommentInput(memeId) {
+        const input = document.getElementById(`comment-input-${memeId}`);
+        input.focus();
+    }
+
+    function toggleAllComments(memeId) {
+        const container = document.getElementById(`comments-${memeId}`);
+        const hiddenComments = container.querySelector('.hidden-comments');
+        const viewAllBtn = container.parentElement.querySelector('.view-all-comments');
+
+        if(hiddenComments.classList.contains('hidden')) {
+            hiddenComments.classList.remove('hidden');
+            viewAllBtn.textContent = 'Show less';
+        } else {
+            hiddenComments.classList.add('hidden');
+            const meme = memesData.find(m => m.meme_id === memeId);
+            viewAllBtn.textContent = `View all ${meme.comments.length} comments`;
+        }
+    }
+
+    // --- Core Like Handler (As provided and confirmed correct) ---
+
+    async function handleLike(e, memeId) {
+        const meme = memesData.find(m => m.meme_id === memeId);
+        const button = e.currentTarget;
+        const icon = button.querySelector('i');
+        const card = button.closest('.meme-card');
+        const countSpan = card.querySelector('.like-count');
+        
+        // Temporarily disable the button to prevent multiple clicks
+        button.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('meme_id', memeId);
+
+            const response = await fetch('/CAMPUS-POLLS/api/meme_like.php', { 
+                method: 'POST', 
+                body: formData 
+            });
             const data = await response.json();
 
             if(data.success) {
-                showNotification('Meme uploaded successfully!', 'success');
-                fileInput.value = '';
-                document.getElementById('meme-caption').value = '';
-                previewContainer.classList.add('hidden');
-                previewImg.src = '';
-                memesLoaded = 0;
-                await loadMemesFromAPI();
+                // Update the meme object in the local array
+                meme.liked = data.liked;
+                meme.likes_count = data.likes_count;
+
+                if(meme.liked) {
+                    button.classList.add('text-red-500');
+                    button.classList.remove('text-gray-700', 'dark:text-gray-300');
+                    // Add shake animation and floating hearts
+                    icon.classList.add('like-animation');
+                    createFloatingHearts(button);
+                } else {
+                    button.classList.remove('text-red-500');
+                    button.classList.add('text-gray-700', 'dark:text-gray-300');
+                }
+
+                // Update the displayed count
+                countSpan.textContent = meme.likes_count;
+                // Remove shake animation after its duration
+                setTimeout(() => icon.classList.remove('like-animation'), 500);
             } else {
-                showNotification(data.message || 'Upload failed', 'error');
+                // If like failed due to not logged in, etc.
+                showNotification(data.message || 'Failed to update like. Are you logged in?', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Failed to update like due to a network error.', 'error');
+        } finally {
+             // Re-enable button
+            button.disabled = false;
+        }
+    }
+
+    function handleShare(e, memeId) {
+        // You should use your actual domain here
+        const shareUrl = `${window.location.origin}/memes/${memeId}`; 
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareUrl);
+            showNotification('Link copied to clipboard! 🔗', 'success');
+        } else {
+            showNotification('Could not copy link. Please manually copy the URL.', 'error');
+        }
+    }
+
+    async function handleAddComment(memeId) {
+        const meme = memesData.find(m => m.meme_id === memeId);
+        const input = document.getElementById(`comment-input-${memeId}`);
+        const commentText = input.value.trim();
+        const addCommentBtn = document.querySelector(`.add-comment-btn[data-id="${memeId}"]`);
+        if(!commentText) return;
+        
+        // Disable post button
+        addCommentBtn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('meme_id', memeId);
+            formData.append('comment_text', commentText);
+
+            const response = await fetch('/CAMPUS-POLLS/api/meme_comment.php', { method:'POST', body: formData });
+            const data = await response.json();
+
+            if(data.success) {
+                const newComment = {
+                    id: data.comment_id || Date.now(),
+                    username: data.username || 'You', // Assuming PHP returns the logged-in user's info
+                    profile_image: data.profile_image,
+                    text: commentText,
+                    likes: 0,
+                    created_at: data.time || 'Just now'
+                };
+
+                // Add the new comment to the local data structure
+                if (!meme.comments) {
+                    meme.comments = [];
+                }
+                meme.comments.push(newComment);
+
+                const container = document.getElementById(`comments-${memeId}`);
+                const hiddenComments = container.querySelector('.hidden-comments');
+                
+                // Determine where to insert the new comment
+                if(meme.comments.length > 2 && hiddenComments) {
+                    hiddenComments.insertAdjacentHTML('beforeend', createCommentHTML(newComment));
+                } else {
+                    container.insertAdjacentHTML('beforeend', createCommentHTML(newComment));
+                }
+
+                input.value = ''; // Clear the input
+                showNotification('Comment posted! 💬', 'success');
+            } else {
+                showNotification(data.message || 'Failed to post comment', 'error');
             }
         } catch(error) {
-            showNotification('Upload error: ' + error.message, 'error');
+            console.error('Error:', error);
+            showNotification('Failed to post comment due to network error.', 'error');
         } finally {
-            uploadBtn.disabled = false;
-            uploadBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Upload Meme';
+            // Re-enable post button (the 'input' listener will manage the disabled state from now on)
+            if(input.value.trim() === '') addCommentBtn.disabled = true; 
         }
-    });
+    }
 
-    loadMemesFromAPI();
-});
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupThemeToggle(); // Initialize dark mode
+
+        const fileInput = document.getElementById('meme-upload');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImg = document.getElementById('meme-preview');
+        const uploadBtn = document.getElementById('upload-btn');
+        const loadMoreBtn = document.getElementById('load-more-memes');
+        
+        // Image Preview Logic
+        fileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if(file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    previewImg.src = e.target.result;
+                    previewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.classList.add('hidden');
+                previewImg.src = '';
+            }
+        });
+
+        // Meme Upload Logic
+        uploadBtn.addEventListener('click', async () => {
+            const caption = document.getElementById('meme-caption').value.trim();
+            const file = fileInput.files[0];
+
+            if(!file || !caption) {
+                showNotification('Please select an image and enter a caption', 'error');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('caption', caption);
+
+            try {
+                const response = await fetch('/CAMPUS-POLLS/api/upload_meme.php', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if(data.success) {
+                    showNotification('Meme uploaded successfully! 🎉', 'success');
+                    // Clear fields and hide preview
+                    fileInput.value = '';
+                    document.getElementById('meme-caption').value = '';
+                    previewContainer.classList.add('hidden');
+                    // Reload all memes to show the new one at the top
+                    await loadMemesFromAPI();
+                } else {
+                    showNotification(data.message || 'Upload failed', 'error');
+                }
+            } catch(error) {
+                showNotification('Upload error: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Upload Meme';
+            }
+        });
+
+        // Load More button event listener
+        loadMoreBtn.addEventListener('click', () => renderMemes(false));
+
+        // Initial meme load
+        loadMemesFromAPI();
+    });
 </script>
 </body>
 </html>

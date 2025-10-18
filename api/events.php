@@ -1,3 +1,17 @@
+<?php
+session_start();
+require 'includes/database.php';
+
+// Fetch events from database
+$sql = "SELECT * FROM events WHERE event_date >= NOW() ORDER BY event_date ASC";
+$result = $conn->query($sql);
+$events = [];
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $events[] = $row;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,18 +52,6 @@
                 opacity: 1;
             }
         }
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top-color: #f59e0b;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="bg-amber-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen relative transition-colors duration-300 font-inter">
@@ -65,7 +67,7 @@
                 <div class="hidden md:flex items-center space-x-4">
                     <a href="index.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
                     <a href="polls.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Polls</a>
-                    <a href="events.html" class="text-gray-800 dark:text-gray-100 font-semibold px-3 py-2 rounded-md text-sm bg-white dark:bg-gray-800 bg-opacity-30">Events</a>
+                    <a href="events.php" class="text-gray-800 dark:text-gray-100 font-semibold px-3 py-2 rounded-md text-sm bg-white dark:bg-gray-800 bg-opacity-30">Events</a>
                     <a href="memes.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
                     <a href="about.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">About Us</a>
                 </div>
@@ -159,12 +161,66 @@
                 </div>
 
                 <div id="events-container">
-                    <!-- Loading spinner -->
-                    <div id="loading" class="flex justify-center items-center py-12">
-                        <div class="loading"></div>
-                        <span class="ml-3 text-gray-600 dark:text-gray-400">Loading events...</span>
-                    </div>
+                    <?php if (empty($events)): ?>
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md text-center">
+                            <i class="fas fa-calendar-times text-6xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 dark:text-gray-400 text-lg">No upcoming events found. Be the first to post one!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php 
+                        $categoryColors = [
+                            'academic' => 'blue',
+                            'social' => 'red',
+                            'sports' => 'green',
+                            'workshop' => 'purple',
+                            'other' => 'gray'
+                        ];
+                        
+                        foreach ($events as $event): 
+                            $color = $categoryColors[$event['category']] ?? 'gray';
+                            $eventDate = new DateTime($event['event_date']);
+                            $displayDate = $eventDate->format('M d, Y');
+                            $displayTime = $eventDate->format('g:i A');
+                        ?>
+                        <div class="event-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-<?php echo $color; ?>-500 transition-colors duration-300 card-hover mb-4" data-category="<?php echo htmlspecialchars($event['category']); ?>">
+                            <div class="flex items-start justify-between mb-3">
+                                <h4 class="text-xl font-bold text-gray-900 dark:text-gray-50"><?php echo htmlspecialchars($event['title']); ?></h4>
+                                <span class="text-xs font-medium text-white bg-<?php echo $color; ?>-500 px-3 py-1 rounded-full shadow-md capitalize"><?php echo htmlspecialchars($event['category']); ?></span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 mb-4"><?php echo nl2br(htmlspecialchars($event['description'])); ?></p>
+                            
+                            <div class="flex items-center space-x-6 text-sm text-gray-700 dark:text-gray-300">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-day text-amber-500 mr-2"></i>
+                                    <span><?php echo $displayDate; ?></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-amber-500 mr-2"></i>
+                                    <span><?php echo $displayTime; ?></span>
+                                </div>
+                                <?php if ($event['is_public']): ?>
+                                <div class="flex items-center">
+                                    <i class="fas fa-globe text-amber-500 mr-2"></i>
+                                    <span>Public</span>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="flex justify-end mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <button class="bg-amber-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-amber-600 transition shadow-md text-sm">
+                                    <i class="fas fa-check mr-1"></i> RSVP
+                                </button>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
+
+                <?php if (count($events) > 5): ?>
+                <div class="text-center p-4">
+                    <button class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">Load More Events</button>
+                </div>
+                <?php endif; ?>
             </section>
         </div>
     </main>
@@ -181,111 +237,6 @@
     </footer>
 
     <script>
-        // Category colors mapping
-        const categoryColors = {
-            'academic': 'blue',
-            'social': 'red',
-            'sports': 'green',
-            'workshop': 'purple',
-            'other': 'gray'
-        };
-
-        // Format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        // Format time
-        function formatTime(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-        }
-
-        // Create event card HTML
-        function createEventCard(event) {
-            const color = categoryColors[event.category] || 'gray';
-            const displayDate = formatDate(event.event_date);
-            const displayTime = formatTime(event.event_date);
-            
-            return `
-                <div class="event-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-${color}-500 transition-colors duration-300 card-hover mb-4" data-category="${event.category}">
-                    <div class="flex items-start justify-between mb-3">
-                        <h4 class="text-xl font-bold text-gray-900 dark:text-gray-50">${escapeHtml(event.title)}</h4>
-                        <span class="text-xs font-medium text-white bg-${color}-500 px-3 py-1 rounded-full shadow-md capitalize">${event.category}</span>
-                    </div>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">${escapeHtml(event.description).replace(/\n/g, '<br>')}</p>
-                    
-                    <div class="flex items-center space-x-6 text-sm text-gray-700 dark:text-gray-300">
-                        <div class="flex items-center">
-                            <i class="fas fa-calendar-day text-amber-500 mr-2"></i>
-                            <span>${displayDate}</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-clock text-amber-500 mr-2"></i>
-                            <span>${displayTime}</span>
-                        </div>
-                        ${event.is_public == 1 ? `
-                        <div class="flex items-center">
-                            <i class="fas fa-globe text-amber-500 mr-2"></i>
-                            <span>Public</span>
-                        </div>
-                        ` : ''}
-                    </div>
-
-                    <div class="flex justify-end mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                        <button class="bg-amber-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-amber-600 transition shadow-md text-sm">
-                            <i class="fas fa-check mr-1"></i> RSVP
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Load events from API
-        function loadEvents(category = 'all') {
-            const container = document.getElementById('events-container');
-            const loading = document.getElementById('loading');
-            
-            if (loading) loading.style.display = 'flex';
-            
-            fetch(`/CAMPUS-POLLS/api/get_events.php?category=${category}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (loading) loading.style.display = 'none';
-                    
-                    if (data.success && data.events.length > 0) {
-                        container.innerHTML = data.events.map(createEventCard).join('');
-                    } else {
-                        container.innerHTML = `
-                            <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md text-center">
-                                <i class="fas fa-calendar-times text-6xl text-gray-400 mb-4"></i>
-                                <p class="text-gray-600 dark:text-gray-400 text-lg">No upcoming events found. Be the first to post one!</p>
-                            </div>
-                        `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading events:', error);
-                    if (loading) loading.style.display = 'none';
-                    container.innerHTML = `
-                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 p-4 rounded-lg">
-                            <p class="text-red-700 dark:text-red-200">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>
-                                Failed to load events. Please try again later.
-                            </p>
-                        </div>
-                    `;
-                });
-        }
-
         // Dark mode toggle
         const themeToggle = document.getElementById('theme-toggle');
         const html = document.documentElement;
@@ -303,11 +254,11 @@
         // Show success/error messages
         function showMessage(type, message) {
             const container = document.getElementById('message-container');
-            const bgColor = type === 'success' ? 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:text-red-200';
+            const bgColor = type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700';
             const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
             
             container.innerHTML = `
-                <div class="alert ${bgColor} border-l-4 p-4 rounded-lg shadow-md flex items-center">
+                <div class="alert ${bgColor} dark:bg-opacity-90 border-l-4 p-4 rounded-lg shadow-md flex items-center">
                     <i class="fas ${icon} mr-3 text-lg"></i>
                     <span>${message}</span>
                     <button onclick="this.parentElement.remove()" class="ml-auto">
@@ -340,12 +291,17 @@
 
         // Filter events by category
         document.getElementById('event-filter').addEventListener('change', function() {
-            loadEvents(this.value);
-        });
-
-        // Load events on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadEvents();
+            const filter = this.value;
+            const eventCards = document.querySelectorAll('.event-card');
+            
+            eventCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                if (filter === 'all' || category === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>

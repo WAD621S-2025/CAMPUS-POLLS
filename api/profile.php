@@ -98,8 +98,7 @@ $stmt->close();
 // Use submitted values if available (after failed POST), otherwise use DB values
 $username = htmlspecialchars($username_db ?? '');
 $full_name = htmlspecialchars($_POST['full_name'] ?? $full_name_db ?? '');
-$profile_image = htmlspecialchars($profile_image_db ?? 'https://placehold.co/100x100/fbbf24/1f2937?text=P');
-$bio = htmlspecialchars($_POST['bio'] ?? $bio_db ?? '');
+$profile_image_path = $profile_image ? "uploads/profile_pics/$profile_image" : "https://placehold.co/100x100/fbbf24/1f2937?text=P";$bio = htmlspecialchars($_POST['bio'] ?? $bio_db ?? '');
 
 $conn->close();
 

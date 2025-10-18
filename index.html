@@ -174,13 +174,6 @@
 
         // Check if user is logged in on page load
         function checkUserSession() {
-            // This would normally check with your backend/PHP session
-            // For demo purposes, you can simulate login like this:
-            // currentUser = { profilePicture: 'path/to/image.jpg' };
-            
-            // Check if there's a user session from your PHP backend
-            // You'll need to add PHP code to output user data
-            // Example: const userData = <?php echo json_encode($_SESSION['user'] ?? null); ?>;
             
             if (currentUser) {
                 updateNavbarForLoggedInUser(currentUser.profilePicture);
