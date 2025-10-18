@@ -1,29 +1,48 @@
-<form action="add_event.php" method="POST">
-    <div>
-        <label for="event-title">Event Title</label>
-        <input type="text" name="title" id="event-title" required>
-    </div>
+<?php
+session_start();
+require '../includes/database.php';
+require '../includes/functions.php';
 
-    <div>
-        <label for="event-category">Event Category</label>
-        <select name="category" id="event-category" required>
-            <option value="">Select Category</option>
-            <option value="academic">Academic</option>
-            <option value="social">Social</option>
-            <option value="sports">Sports</option>
-            <option value="workshop">Workshop</option>
-        </select>
-    </div>
+$content = "New event '{$title}' has been posted.";
+$link = "events.html";
+createNotification($conn, 1, $content, $link);
 
-    <div>
-        <label for="event-description">Event Description</label>
-        <textarea name="description" id="event-description" required></textarea>
-    </div>
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Forbid non-POST requests
+    http_response_code(405);
+    echo "Method Not Allowed";
+    exit();
+}
 
-    <div>
-        <label for="event-date">Event Date & Time</label>
-        <input type="datetime-local" name="event_date" id="event-date" required>
-    </div>
+$title = trim($_POST['title'] ?? '');
+$category = trim($_POST['category'] ?? '');
+$description = trim($_POST['description'] ?? '');
+$event_date = trim($_POST['event_date'] ?? '');
+$is_public = isset($_POST['is_public']) ? 1 : 0;
 
-    <button type="submit">Create Event</button>
-</form>
+// Basic validation
+if (!$title || !$category || !$description || !$event_date) {
+    // Could redirect back with error or just exit with message
+    echo "Please fill in all required fields.";
+    exit();
+}
+
+// Insert event into your events table
+$stmt = $conn->prepare("INSERT INTO events (title, category, description, event_date, is_public, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+if (!$stmt) {
+    echo "Prepare statement failed: " . $conn->error;
+    exit();
+}
+$stmt->bind_param("ssssi", $title, $category, $description, $event_date, $is_public);
+
+if ($stmt->execute()) {
+    $stmt->close();
+    // Success: redirect or show success message
+    header("Location: /CAMPUS-POLLS/events.html?success=1");
+    exit();
+} else {
+    echo "Failed to insert event: " . $stmt->error;
+    $stmt->close();
+    exit();
+}
+?>
