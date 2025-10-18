@@ -97,7 +97,7 @@
                     <i class="fas fa-plus-circle mr-2 text-amber-500"></i> Post a New Event
                 </h3>
                 
-                <form action="/CAMPUS-POLLS/api/add_event.php" method="POST" class="space-y-4">
+                <form action="api/add_event.php" method="POST" class="space-y-4">
                     <div>
                         <input type="text" name="title" id="event-title" placeholder="Event Title (e.g., Annual Science Fair)"
                                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100" required>
@@ -202,6 +202,13 @@
             return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         }
 
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Create event card HTML
         function createEventCard(event) {
             const color = categoryColors[event.category] || 'gray';
@@ -214,7 +221,7 @@
                         <h4 class="text-xl font-bold text-gray-900 dark:text-gray-50">${escapeHtml(event.title)}</h4>
                         <span class="text-xs font-medium text-white bg-${color}-500 px-3 py-1 rounded-full shadow-md capitalize">${event.category}</span>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">${escapeHtml(event.description).replace(/\n/g, '<br>')}</p>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">${escapeHtml(event.description)}</p>
                     
                     <div class="flex items-center space-x-6 text-sm text-gray-700 dark:text-gray-300">
                         <div class="flex items-center">
@@ -242,13 +249,6 @@
             `;
         }
 
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
         // Load events from API
         function loadEvents(category = 'all') {
             const container = document.getElementById('events-container');
@@ -256,9 +256,10 @@
             
             if (loading) loading.style.display = 'flex';
             
-            fetch(`/CAMPUS-POLLS/api/get_events.php?category=${category}`)
+            fetch(`api/get_events.php?category=${category}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Events loaded:', data); // Debug
                     if (loading) loading.style.display = 'none';
                     
                     if (data.success && data.events.length > 0) {
@@ -345,6 +346,7 @@
 
         // Load events on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, fetching events...');
             loadEvents();
         });
     </script>

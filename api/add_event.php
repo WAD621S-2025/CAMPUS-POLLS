@@ -1,16 +1,23 @@
 <?php
 session_start();
-require '../includes/database.php';
-require '../includes/functions.php';
 
-// Check if request method is POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo "Method Not Allowed";
+$host = "127.0.0.1";
+$port = 3307;
+$username = "root";
+$password = "";
+$dbname = "buzz";
+
+$conn = new mysqli($host, $username, $password, $dbname, $port);
+
+if ($conn->connect_error) {
+    die("DB connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: http://127.0.0.1/CAMPUS-POLLS/events.html?error=invalid_request");
     exit();
 }
 
-// Get and sanitize form data
 $title = trim($_POST['title'] ?? '');
 $category = trim($_POST['category'] ?? '');
 $description = trim($_POST['description'] ?? '');
@@ -19,14 +26,7 @@ $is_public = isset($_POST['is_public']) ? 1 : 0;
 
 // Basic validation
 if (!$title || !$category || !$description || !$event_date) {
-    header("Location: /CAMPUS-POLLS/events.html?error=missing_fields");
-    exit();
-}
-
-// Validate datetime format (optional but recommended)
-$datetime = DateTime::createFromFormat('Y-m-d\TH:i', $event_date);
-if (!$datetime) {
-    header("Location: /CAMPUS-POLLS/events.html?error=invalid_date");
+    header("Location: http://127.0.0.1/CAMPUS-POLLS/events.html?error=missing_fields");
     exit();
 }
 
@@ -35,28 +35,24 @@ $stmt = $conn->prepare("INSERT INTO events (title, category, description, event_
 
 if (!$stmt) {
     error_log("Prepare statement failed: " . $conn->error);
-    header("Location: /CAMPUS-POLLS/events.html?error=database");
+    header("Location: http://127.0.0.1/CAMPUS-POLLS/events.html?error=database");
     exit();
 }
 
 $stmt->bind_param("ssssi", $title, $category, $description, $event_date, $is_public);
 
 if ($stmt->execute()) {
-    $event_id = $stmt->insert_id; // Get the ID of the newly created event
     $stmt->close();
-    
-    // Create notification AFTER successful insertion
-    $content = "New event '{$title}' has been posted.";
-    $link = "events.html";
-    createNotification($conn, 1, $content, $link);
+    $conn->close();
     
     // Success: redirect with success message
-    header("Location: /CAMPUS-POLLS/events.php?success=1");
+    header("Location: http://127.0.0.1/CAMPUS-POLLS/events.html?success=1");
     exit();
 } else {
     error_log("Failed to insert event: " . $stmt->error);
     $stmt->close();
-    header("Location: /CAMPUS-POLLS/events.html?error=insert_failed");
+    $conn->close();
+    header("Location: http://127.0.0.1/CAMPUS-POLLS/events.html?error=insert_failed");
     exit();
 }
 ?>
