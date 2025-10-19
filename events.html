@@ -289,7 +289,7 @@
             // Construct API endpoint with filter
             const endpoint = filter === 'all' 
                 ? 'api/get_events.php' 
-                : `api/get_events.php?category=${filter}`;
+                : 'api/get_events.php?category=${filter}';
 
             fetch(endpoint)
                 .then(response => {
