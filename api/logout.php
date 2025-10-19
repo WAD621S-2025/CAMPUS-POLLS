@@ -1,7 +1,6 @@
 <?php
 // api/logout.php - Logout handler
 session_start();
-
 // Database connection
 $host = "127.0.0.1";
 $port = 3307;
