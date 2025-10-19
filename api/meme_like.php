@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 // IMPORTANT: Make sure 'database.php' and 'functions.php' are in the 'includes' directory relative to the current file (api/).
 require_once '../includes/database.php';
