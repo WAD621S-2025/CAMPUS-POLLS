@@ -1,4 +1,4 @@
-# BUZZ-CAMPUS-POLLS-AN-MEMES-
+# BUZZ-CAMPUS-POLLS-AND-MEMES-
 
 # *Introduction & Background* 
 
