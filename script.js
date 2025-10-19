@@ -14,7 +14,7 @@ $(document).ready(function() {
       return;
     }
 
-    uploadBtn.prop('disabled', true);
+    uploadBtn.prop('disabled', false);
     uploadBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...');
 
     const formData = new FormData();
@@ -22,10 +22,10 @@ $(document).ready(function() {
     formData.append('caption', caption);
 
     try {
-      const response = await fetch('api/upload_meme.php', {
+      const response = await fetch('upload_meme.php', {
         method: 'POST',
         body: formData,
-        credentials: 'include'  // if your session cookie is required
+        credentials: 'include'  
       });
       const data = await response.json();
 

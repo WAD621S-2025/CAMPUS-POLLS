@@ -174,6 +174,8 @@
                     <span id="upload-text"><i class="fas fa-paper-plane mr-2"></i> Upload Meme</span>
                 </button>
             </div>
+
+
         </section>
 
         <section id="meme-feed" class="space-y-6">
@@ -192,11 +194,135 @@
             </div>
 
             <div id="memes-grid" class="space-y-6">
+<div class="meme-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-300 p-4 card-hover" data-id="101">
+  <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center space-x-3">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-10 h-10 rounded-full border-2 border-amber-400" alt="Coder123" />
+      <div>
+        <p class="font-semibold text-sm text-gray-900 dark:text-gray-50">Coder123</p>
+      </div>
+    </div>
+  </div>
+  <img src="https://i.imgflip.com/5t7m7s.jpg" alt="Meme" class="w-full h-auto object-cover rounded-lg mb-3" />
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center space-x-4">
+      <button class="like-btn text-gray-700 dark:text-gray-300 hover:text-red-500 transition-colors text-2xl" title="Like" data-id="101">
+        <i class="fas fa-heart"></i>
+      </button>
+      <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Comment" onclick="focusCommentInput(101)">
+        <i class="far fa-comment"></i>
+      </button>
+    </div>
+  </div>
+  <div class="like-count-display mb-3">
+    <p class="font-semibold text-sm text-gray-900 dark:text-gray-50"><span class="like-count">10</span> likes</p>
+  </div>
+  <div class="text-sm mb-3">
+    <span class="font-semibold text-gray-900 dark:text-gray-50">Coder123</span>
+    <span class="text-gray-700 dark:text-gray-300 ml-2">When the code finally works!</span>
+  </div>
+  <div class="comments-container space-y-2 mb-3" id="comments-101">
+    <div class="comment-item flex items-start space-x-2 text-sm">
+      <div class="flex-1 min-w-0">
+        <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2">
+          <p class="comment-username font-semibold text-gray-900 dark:text-gray-50">DevGal</p>
+          <p class="comment-text text-gray-700 dark:text-gray-300">So relatable!</p>
+        </div>
+      </div>
+    </div>
+    <div class="comment-item flex items-start space-x-2 text-sm">
+      <div class="flex-1 min-w-0">
+        <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2">
+          <p class="comment-username font-semibold text-gray-900 dark:text-gray-50">BugHunter</p>
+          <p class="comment-text text-gray-700 dark:text-gray-300">Took me hours too!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center space-x-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+    <input type="text" id="comment-input-101" placeholder="Add a comment..." class="flex-1 bg-transparent text-sm focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400" data-id="101" />
+    <button class="add-comment-btn text-amber-500 font-semibold text-sm hover:text-amber-600 disabled:opacity-50 disabled:cursor-not-allowed" data-id="101" disabled>Post</button>
+  </div>
+</div>
+
+<div class="meme-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-300 p-4 card-hover" data-id="102">
+  <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center space-x-3">
+      <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full border-2 border-amber-400" alt="DebugMaster" />
+      <div>
+        <p class="font-semibold text-sm text-gray-900 dark:text-gray-50">DebugMaster</p>
+      </div>
+    </div>
+  </div>
+  <img src="https://i.imgflip.com/4/30b1gx.jpg" alt="Meme" class="w-full h-auto object-cover rounded-lg mb-3" />
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center space-x-4">
+      <button class="like-btn text-red-500 hover:text-red-600 transition-colors text-2xl" title="Like" data-id="102">
+        <i class="fas fa-heart"></i>
+      </button>
+      <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Comment" onclick="focusCommentInput(102)">
+        <i class="far fa-comment"></i>
+      </button>
+    </div>
+  </div>
+  <div class="like-count-display mb-3">
+    <p class="font-semibold text-sm text-gray-900 dark:text-gray-50"><span class="like-count">5</span> likes</p>
+  </div>
+  <div class="text-sm mb-3">
+    <span class="font-semibold text-gray-900 dark:text-gray-50">DebugMaster</span>
+    <span class="text-gray-700 dark:text-gray-300 ml-2">Debugging be like...</span>
+  </div>
+  <div class="comments-container space-y-2 mb-3" id="comments-102"></div>
+  <div class="flex items-center space-x-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+    <input type="text" id="comment-input-102" placeholder="Add a comment..." class="flex-1 bg-transparent text-sm focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400" data-id="102" />
+    <button class="add-comment-btn text-amber-500 font-semibold text-sm hover:text-amber-600 disabled:opacity-50 disabled:cursor-not-allowed" data-id="102" disabled>Post</button>
+  </div>
+</div>
+
+<div class="meme-card bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-300 p-4 card-hover" data-id="103">
+  <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center space-x-3">
+      <img src="https://randomuser.me/api/portraits/men/85.jpg" class="w-10 h-10 rounded-full border-2 border-amber-400" alt="TechieBee" />
+      <div>
+        <p class="font-semibold text-sm text-gray-900 dark:text-gray-50">TechieBee</p>
+      </div>
+    </div>
+  </div>
+  <img src="https://i.imgflip.com/1bij.jpg" alt="Meme" class="w-full h-auto object-cover rounded-lg mb-3" />
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center space-x-4">
+      <button class="like-btn text-gray-700 dark:text-gray-300 hover:text-red-500 transition-colors text-2xl" title="Like" data-id="103">
+        <i class="fas fa-heart"></i>
+      </button>
+      <button class="text-gray-700 dark:text-gray-300 hover:text-amber-500 transition-colors text-2xl" title="Comment" onclick="focusCommentInput(103)">
+        <i class="far fa-comment"></i>
+      </button>
+    </div>
+  </div>
+  <div class="like-count-display mb-3">
+    <p class="font-semibold text-sm text-gray-900 dark:text-gray-50"><span class="like-count">2</span> likes</p>
+  </div>
+  <div class="text-sm mb-3">
+    <span class="font-semibold text-gray-900 dark:text-gray-50">TechieBee</span>
+    <span class="text-gray-700 dark:text-gray-300 ml-2">Me explaining the bugs I fixed</span>
+  </div>
+  <div class="comments-container space-y-2 mb-3" id="comments-103">
+    <div class="comment-item flex items-start space-x-2 text-sm">
+      <div class="flex-1 min-w-0">
+        <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2">
+          <p class="comment-username font-semibold text-gray-900 dark:text-gray-50">CodeNerd</p>
+          <p class="comment-text text-gray-700 dark:text-gray-300">Haha classic!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center space-x-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+    <input type="text" id="comment-input-103" placeholder="Add a comment..." class="flex-1 bg-transparent text-sm focus:outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400" data-id="103" />
+    <button class="add-comment-btn text-amber-500 font-semibold text-sm hover:text-amber-600 disabled:opacity-50 disabled:cursor-not-allowed" data-id="103" disabled>Post</button>
+  </div>
+</div>
                 </div>
 
-            <div class="text-center p-4">
-                <button id="load-more-memes" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">Load More Memes</button>
-            </div>
         </section>
     </main>
 
@@ -263,10 +389,6 @@
         }
     }
 
-    // --- API & Rendering Logic ---
-
-   // Replace the loadMemesFromAPI function in your memes.html with this:
-
 async function loadMemesFromAPI() {
     const container = document.getElementById('memes-grid');
     container.innerHTML = `<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i><p class="mt-2 text-gray-500 dark:text-gray-400">Loading memes...</p></div>`;
@@ -312,8 +434,6 @@ async function loadMemesFromAPI() {
         </div>`;
     }
 }
-
-// Also update the upload button event listener - find this section and replace:
 
 uploadBtn.addEventListener('click', async () => {
     const caption = document.getElementById('meme-caption').value.trim();
@@ -595,8 +715,7 @@ async function handleAddComment(memeId) {
             container.innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-gray-400"><i class="fas fa-box-open text-4xl"></i><p class="mt-2">No memes posted yet. Be the first!</p></div>`;
         }
     }
-    
-    // The rest of the event setup functions remain as provided
+
     function setupCardEventListeners(card, meme) {
         const likeBtn = card.querySelector('.like-btn');
         likeBtn.addEventListener('click', e => handleLike(e, meme.meme_id));
@@ -675,7 +794,6 @@ async function handleAddComment(memeId) {
                     button.classList.remove('text-red-500');
                     button.classList.add('text-gray-700', 'dark:text-gray-300');
                 }
-
                 // Update the displayed count
                 countSpan.textContent = meme.likes_count;
                 // Remove shake animation after its duration
@@ -761,8 +879,6 @@ async function handleAddComment(memeId) {
             if(input.value.trim() === '') addCommentBtn.disabled = true; 
         }
     }
-
-
     document.addEventListener('DOMContentLoaded', () => {
         setupThemeToggle(); // Initialize dark mode
 
@@ -771,7 +887,6 @@ async function handleAddComment(memeId) {
         const previewImg = document.getElementById('meme-preview');
         const uploadBtn = document.getElementById('upload-btn');
         const loadMoreBtn = document.getElementById('load-more-memes');
-        
         // Image Preview Logic
         fileInput.addEventListener('change', e => {
             const file = e.target.files[0];
@@ -787,7 +902,6 @@ async function handleAddComment(memeId) {
                 previewImg.src = '';
             }
         });
-
         // Meme Upload Logic
         uploadBtn.addEventListener('click', async () => {
             const caption = document.getElementById('meme-caption').value.trim();
