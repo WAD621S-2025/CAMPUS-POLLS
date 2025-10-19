@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Enable error display for immediate debugging. REMOVE THIS ONCE LIVE.
+
 error_reporting(E_ALL); 
 ini_set('display_errors', 1);
 
@@ -9,9 +9,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// --- 1. Database Configuration (Direct mysqli Connection) ---
 $host = "127.0.0.1";
-$port = 3307; // Verify this port is correct (often 3306)
+$port = 3307; 
 $username = "root";
 $password = "";
 $dbname = "buzz";
@@ -24,14 +23,13 @@ if ($conn->connect_error) {
 $user_id = $_SESSION['user_id'];
 $status_message = ''; 
 
-// --- Helper Functions and Setup ---
 
-// Directory where images will be stored (relative to this PHP file's location)
+// Directory where images will be stored 
 $upload_dir = 'uploads/profile_pics/'; 
 if (!is_dir($upload_dir)) {
     // Attempt to create the directory if it doesn't exist
     if (!mkdir($upload_dir, 0777, true)) {
-         // This is a critical failure point. Log and set message.
+         
          error_log("Failed to create upload directory: " . $upload_dir);
          $status_message = '<div class="p-3 bg-red-100 text-red-700 rounded-lg"><i class="fas fa-times-circle mr-2"></i>Critical Error: Upload folder could not be created or accessed. Check folder permissions (should be 777).</div>';
     }
@@ -47,7 +45,7 @@ function log_activity($conn, $user_id, $activity_type, $description, $reference_
     return $success;
 }
 
-// --- 2. Handle Form Submission (POST Request) ---
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     
     $full_name = trim($_POST['full_name'] ?? '');
@@ -85,10 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         // Handle other file upload errors (e.g., UPLOAD_ERR_INI_SIZE)
         $status_message = '<div class="p-3 bg-red-100 text-red-700 rounded-lg"><i class="fas fa-times-circle mr-2"></i>File Upload Failed. PHP Error Code: ' . $_FILES['profile_image']['error'] . '</div>';
     }
-    // --- End Image Upload Handling ---
-
-
-    // Only proceed with DB update if no critical errors occurred and there's data to save
+    
     if (empty($full_name) && !$image_path_for_db && empty($status_message)) {
         // Only show error if they haven't filled anything and haven't selected an image
         if (empty($full_name)) {
