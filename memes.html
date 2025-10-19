@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+     <script src="assets/js/theme.js"></script>
     <style>
         /* Your usual styling */
         .card-hover {
@@ -207,6 +208,25 @@
                 <a href="#" class="hover:text-white transition" title="Instagram"><i class="fab fa-instagram"></i></a>
             </div>
         </div>
+
+        <div class="bee-mascot fixed bottom-8 right-8 z-40 cursor-pointer hover:scale-110 transition-transform duration-300" title="Buzz the Bee!">
+    <div class="relative animate-bounce">
+        <span class="text-6xl filter drop-shadow-lg">🐝</span>
+        <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+            Hi there!
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+.bee-mascot {
+    animation: float 3s ease-in-out infinite;
+}
+</style>
     </footer>
 
 <script>
@@ -215,21 +235,6 @@
     const MEMES_PER_LOAD = 5;
 
     // --- Utility Functions ---
-
-    function setupThemeToggle() {
-        const themeToggle = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        
-        if (currentTheme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-        });
-    }
 
     function showNotification(message, type = 'success') {
         const notification = document.getElementById('notification');

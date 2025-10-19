@@ -219,3 +219,28 @@ body {
     animation-delay: 0.3s;
 }
 
+.event-card {
+    position: relative;
+}
+
+.event-card:hover .event-preview {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.event-preview {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 0 0 12px 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}

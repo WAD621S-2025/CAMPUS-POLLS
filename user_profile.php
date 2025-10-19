@@ -116,6 +116,7 @@ $conn->close();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+     <script src="assets/js/theme.js"></script>
 </head>
 
 <body class="bg-amber-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen relative transition-colors duration-300 font-inter">
@@ -191,6 +192,25 @@ $conn->close();
                         <div class="text-3xl font-bold text-gray-900 dark:text-gray-100"><?= $comments_count ?></div>
                         <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Comments</div>
                     </div>
+
+                    <div class="bee-mascot fixed bottom-8 right-8 z-40 cursor-pointer hover:scale-110 transition-transform duration-300" title="Buzz the Bee!">
+    <div class="relative animate-bounce">
+        <span class="text-6xl filter drop-shadow-lg">🐝</span>
+        <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+            Hi there!
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+.bee-mascot {
+    animation: float 3s ease-in-out infinite;
+}
+</style>
 
                 </section>
 
@@ -284,22 +304,6 @@ $conn->close();
            -webkit-line-clamp: 2; 
        }
 </style>
-
-    <script>
-        // Dark mode toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        
-        // Apply saved theme or system preference
-        if (currentTheme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-        });
-    </script>
+   
 </body>
 </html>

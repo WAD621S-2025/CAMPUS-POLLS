@@ -8,30 +8,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script src="assets/js/theme.js"></script>
 </head>
-<body class="bg-amber-50 text-gray-800 flex flex-col min-h-screen relative">
+<body class="bg-amber-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen relative transition-colors duration-300 font-inter">
     <div class="honeycomb-bg"></div>
 
     <!-- Header -->
-    <header class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg sticky top-0 z-50">
+    <header class="bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 shadow-lg sticky top-0 z-50 transition-colors duration-300">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <a href="index.html" class="flex items-center">
-                    <i class="fas fa-university text-2xl text-gray-800 mr-2"></i>
-                    <h1 class="text-xl font-bold text-gray-800">🐝 BUZZ</h1>
+                    <i class="fas fa-university text-2xl text-gray-800 dark:text-gray-100 mr-2"></i>
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">🐝 BUZZ</h1>
                 </a>
                 <div class="hidden md:flex items-center space-x-4">
-                    <a href="index.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
-                    <a href="polls.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Polls</a>
-                    <a href="events.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Events</a>
-                    <a href="memes.html" class="text-gray-800 hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
-                    <a href="about.html" class="text-gray-800 font-semibold px-3 py-2 rounded-md text-sm bg-white bg-opacity-30">About Us</a>
+                    <a href="index.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Home</a>
+                    <a href="polls.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Polls</a>
+                    <a href="events.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Events</a>
+                    <a href="memes.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
+                    <a href="about.html" class="text-gray-800 dark:text-gray-100 font-semibold px-3 py-2 rounded-md text-sm bg-white dark:bg-gray-800 bg-opacity-30">About Us</a>
                 </div>
-                <div class="flex items-center">
-                  <!-- Login/Sign Up Link - Hidden when logged in -->
-                    <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up
-                    </a>
-                    <!-- User Profile Link - Always visible -->
+                <div class="flex items-center space-x-4">
+                    <!-- Theme Toggle Button - THIS WAS MISSING! -->
+                    <button id="theme-toggle" class="theme-toggle p-2 rounded-md bg-white dark:bg-gray-800 bg-opacity-30 hover:bg-opacity-50 transition" title="Toggle Dark Mode">
+                        <i class="fas fa-moon dark:hidden text-gray-800"></i>
+                        <i class="fas fa-sun hidden dark:inline text-yellow-300"></i>
+                    </button>
+                    <!-- Login/Sign Up Link -->
+                    <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up</a>
+                    <!-- User Profile Link -->
                     <a href="user_profile.php" id="profile-link">
                         <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=P" alt="User Avatar">
                     </a>
@@ -42,56 +47,75 @@
 
     <!-- Main Content -->
     <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
-         <div class="bg-white border-2 border-amber-300 p-8 rounded-lg shadow-lg">
+         <div class="bg-white dark:bg-gray-800 border-2 border-amber-300 dark:border-amber-600 p-8 rounded-lg shadow-lg transition-colors duration-300">
             <div class="text-center mb-6">
                 <div class="text-6xl mb-4 float-animation">🐝</div>
-                <h2 class="text-4xl font-bold mb-4 text-gray-800">About BUZZ</h2>
+                <h2 class="text-4xl font-bold mb-4 text-gray-800 dark:text-gray-100">About BUZZ</h2>
             </div>
             
             <div class="prose max-w-none">
-                <p class="text-gray-700 leading-relaxed text-lg">
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
                     BUZZ was founded with a simple mission: to build a stronger, more engaged, and more connected campus community. We believe that student life is about more than just classes and exams. It's about the shared experiences, the inside jokes, the late-night study sessions, and the collective spirit that makes your university unique.
                 </p>
-                <p class="text-gray-700 leading-relaxed mt-4 text-lg">
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-4 text-lg">
                     The BUZZ Platform gives students a lively space to share opinions and humour. 
                     Instead of conversations staying in small circles, everyone can join in on the buzz, whether it's voting on polls or posting memes that capture the campus vibe.
                 </p>
             </div>
 
             <!-- Mission Section -->
-            <div class="mt-8 bg-amber-50 border-l-4 border-amber-500 p-6 rounded">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">🎯 Our Mission</h3>
-                <p class="text-gray-700 leading-relaxed">
+            <div class="mt-8 bg-amber-50 dark:bg-amber-900 border-l-4 border-amber-500 p-6 rounded transition-colors duration-300">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">🎯 Our Mission</h3>
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
                     To create a vibrant digital hive where every student's voice matters, where laughter is shared freely, and where the campus community buzzes with energy and connection.
                 </p>
             </div>
 
             <!-- Features Section -->
             <div class="mt-8 grid md:grid-cols-3 gap-6">
-                <div class="bg-gradient-to-br from-yellow-50 to-amber-100 border-2 border-amber-300 p-6 rounded-lg text-center">
+                <div class="bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-amber-900 dark:to-yellow-900 border-2 border-amber-300 dark:border-amber-600 p-6 rounded-lg text-center transition-colors duration-300">
                     <div class="text-4xl mb-3">📊</div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Voice Your Opinion</h4>
-                    <p class="text-sm text-gray-600">Participate in polls and see what your fellow students think</p>
+                    <h4 class="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2">Voice Your Opinion</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Participate in polls and see what your fellow students think</p>
                 </div>
 
-                <div class="bg-gradient-to-br from-yellow-50 to-amber-100 border-2 border-amber-300 p-6 rounded-lg text-center">
+                <div class="bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-amber-900 dark:to-yellow-900 border-2 border-amber-300 dark:border-amber-600 p-6 rounded-lg text-center transition-colors duration-300">
                     <div class="text-4xl mb-3">😂</div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Share the Laughs</h4>
-                    <p class="text-sm text-gray-600">Post and enjoy memes that capture campus life</p>
+                    <h4 class="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2">Share the Laughs</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Post and enjoy memes that capture campus life</p>
                 </div>
 
-                <div class="bg-gradient-to-br from-yellow-50 to-amber-100 border-2 border-amber-300 p-6 rounded-lg text-center">
+                <div class="bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-amber-900 dark:to-yellow-900 border-2 border-amber-300 dark:border-amber-600 p-6 rounded-lg text-center transition-colors duration-300">
                     <div class="text-4xl mb-3">🤝</div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Build Community</h4>
-                    <p class="text-sm text-gray-600">Connect with students across your entire campus</p>
+                    <h4 class="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2">Build Community</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Connect with students across your entire campus</p>
                 </div>
             </div>
 
+            <div class="bee-mascot fixed bottom-8 right-8 z-40 cursor-pointer hover:scale-110 transition-transform duration-300" title="Buzz the Bee!">
+    <div class="relative animate-bounce">
+        <span class="text-6xl filter drop-shadow-lg">🐝</span>
+        <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+            Hi there!
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+.bee-mascot {
+    animation: float 3s ease-in-out infinite;
+}
+</style>
+
             <!-- Join Section -->
-            <div class="mt-8 bg-gradient-to-r from-yellow-400 to-amber-500 p-6 rounded-lg text-center">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Join the Hive Today! 🐝</h3>
-                <p class="text-gray-800 mb-4">Be part of the buzz and make your campus experience even better.</p>
-                <a href="register.html" class="inline-block bg-gray-800 text-amber-400 px-6 py-3 rounded-lg font-bold hover:bg-gray-900 transition shadow-lg">
+            <div class="mt-8 bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 p-6 rounded-lg text-center transition-colors duration-300">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">Join the Hive Today! 🐝</h3>
+                <p class="text-gray-800 dark:text-gray-100 mb-4">Be part of the buzz and make your campus experience even better.</p>
+                <a href="register.html" class="inline-block bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-gray-900 dark:hover:bg-amber-600 transition shadow-lg">
                     Get Started
                 </a>
             </div>
@@ -99,9 +123,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 shadow-inner mt-auto relative z-10">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800">
+    <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 shadow-inner mt-auto relative z-10 transition-colors duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800 dark:text-gray-100">
             <p>&copy; 2025 BUZZ. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-4 mt-2">
+                <a href="#" class="hover:text-white transition" title="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="hover:text-white transition" title="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-white transition" title="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
         </div>
     </footer>
     

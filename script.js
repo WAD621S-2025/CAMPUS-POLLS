@@ -1,11 +1,8 @@
-// Ensure jQuery is loaded on your pages before this script
 
 $(document).ready(function() {
 
-  // ============================================
-  // Polls Features
-  // ============================================
 
+  // Polls Features
   function fetchPolls() {
     $.ajax({
       url: 'get_polls.php',
@@ -178,11 +175,6 @@ $(document).ready(function() {
     });
   }
 
-
-  // ============================================
-  // Memes Features
-  // ============================================
-
   function fetchMemes() {
     $.ajax({
       url: 'get_memes.php',
@@ -297,15 +289,6 @@ $(document).ready(function() {
     });
   }
 
-  // ============================================
-  // Poll Creation & Meme Upload can still use form posts or be extended here with AJAX
-  // ============================================
-
-
-  // ============================================
-  // Notifications
-  // ============================================
-
   function showNotification(message) {
     const $notify = $('<div class="notification fixed top-20 right-4 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg z-50"></div>');
     $notify.text(message);
@@ -313,10 +296,6 @@ $(document).ready(function() {
     $notify.fadeOut(3000, () => $notify.remove());
   }
 
-
-  // ============================================
-  // Initialization
-  // ============================================
 
   // Fetch data on page load
   fetchPolls();

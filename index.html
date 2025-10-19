@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <script src="assets/js/theme.js"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -30,6 +31,24 @@
                     <a href="memes.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">Memes</a>
                     <a href="about.html" class="text-gray-800 dark:text-gray-100 hover:bg-white dark:hover:bg-gray-800 hover:bg-opacity-20 px-3 py-2 rounded-md text-sm font-medium transition">About Us</a>
                 </div>
+                <div class="bee-mascot fixed bottom-8 right-8 z-40 cursor-pointer hover:scale-110 transition-transform duration-300" title="Buzz the Bee!">
+    <div class="relative animate-bounce">
+        <span class="text-6xl filter drop-shadow-lg">🐝</span>
+        <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+            Hi there!
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+.bee-mascot {
+    animation: float 3s ease-in-out infinite;
+}
+</style>
                 <div class="flex items-center space-x-4">
                     <!-- Dark Mode Toggle -->
                     <button id="theme-toggle" class="theme-toggle p-2 rounded-md bg-white dark:bg-gray-800 bg-opacity-30 hover:bg-opacity-50 transition" title="Toggle Dark Mode">
@@ -204,24 +223,6 @@
             // Reset profile picture to placeholder
             profileAvatar.src = 'https://placehold.co/100x100/fbbf24/1f2937?text=P';
         }
-
-        // Dark mode toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            html.classList.add('dark');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            
-            // Save theme preference
-            const theme = html.classList.contains('dark') ? 'dark' : 'light';
-            localStorage.setItem('theme', theme);
-        });
 
         // Animate elements on page load
         document.addEventListener('DOMContentLoaded', function() {

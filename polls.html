@@ -10,26 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css" />
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.poll-progress').forEach(bar => {
-                const progressValue = bar.parentElement.getAttribute('data-progress');
-                if (progressValue) {
-                    bar.style.width = progressValue + '%';
-                }
-            });
-        });
-    </script>
+    <script src="assets/js/theme.js"></script>
     <style>
-        /* This is crucial to prevent the poll-result's background style from affecting the unvoted options */
-        .poll-result-wrapper .block {
-            padding: 0; /* Remove padding */
-            border-radius: 0; /* Remove border-radius */
-            background: none; /* Remove background */
-            position: static;
-        }
-
-        /* Add card hover effect for consistency */
         .card-hover {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
@@ -37,6 +19,27 @@
         .card-hover:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-bar {
+            transition: width 1s ease-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .bee-mascot {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .view-toggle-btn {
+            transition: all 0.3s ease;
+        }
+
+        .view-toggle-btn.active {
+            background-color: #f59e0b;
+            color: white;
         }
     </style>
 </head>
@@ -62,9 +65,7 @@
                         <i class="fas fa-moon dark:hidden text-gray-800"></i>
                         <i class="fas fa-sun hidden dark:inline text-yellow-300"></i>
                     </button>
-                    <!-- Login/Sign Up Link - Hidden when logged in -->
                     <a href="login.html" id="login-link" class="bg-gray-800 dark:bg-amber-500 text-amber-400 dark:text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-900 dark:hover:bg-amber-600 transition">Login / Sign Up</a>
-                    <!-- User Profile Link - Always visible -->
                     <a href="user_profile.php" id="profile-link">
                         <img id="profile-avatar" class="h-8 w-8 rounded-full object-cover border-2 border-gray-800 dark:border-amber-400" src="https://placehold.co/100x100/fbbf24/1f2937?text=P" alt="User Avatar">
                     </a>
@@ -101,7 +102,6 @@
                     </button>
 
                     <div class="pt-4 border-t border-amber-100 dark:border-gray-700 space-y-3">
-                        
                         <label class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
                             <input type="checkbox" name="is_anonymous" value="1" class="form-checkbox h-4 w-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500">
                             <span class="ml-2">Anonymous Poll</span>
@@ -142,7 +142,6 @@
                 </div>
 
                 <div id="polls-container">
-                    <!-- Polls will be loaded here dynamically -->
                     <div class="text-center py-8">
                         <i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i>
                         <p class="mt-2 text-gray-600 dark:text-gray-400">Loading polls...</p>
@@ -152,10 +151,19 @@
                 <div class="text-center p-4">
                     <button class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">Load More Polls</button>
                 </div>
-
             </section>
         </div>
     </main>
+
+    <!-- Floating Bee Mascot -->
+    <div class="bee-mascot fixed bottom-8 right-8 z-40 cursor-pointer hover:scale-110 transition-transform duration-300" title="Buzz the Bee!">
+        <div class="relative">
+            <span class="text-6xl filter drop-shadow-lg">🐝</span>
+            <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                Hi there!
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 shadow-inner mt-auto relative z-10 transition-colors duration-300">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-800 dark:text-gray-100">
@@ -169,48 +177,7 @@
     </footer>
 
     <script>
-        // User session management (in-memory storage)
-        let currentUser = null;
-
-        // Check if user is logged in on page load
-        function checkUserSession() {
-            // This would normally check with your backend/PHP session
-            // For demo purposes, you can simulate login like this:
-            // currentUser = { profilePicture: 'path/to/image.jpg' };
-            
-            // Check if there's a user session from your PHP backend
-            // You'll need to add PHP code to output user data
-            // Example: const userData = <?php echo json_encode($_SESSION['user'] ?? null); ?>;
-            
-            if (currentUser) {
-                updateNavbarForLoggedInUser(currentUser.profilePicture);
-            }
-        }
-
-        // Update navbar when user logs in
-        function updateNavbarForLoggedInUser(profilePictureUrl) {
-            const loginLink = document.getElementById('login-link');
-            const profileAvatar = document.getElementById('profile-avatar');
-            
-            // Hide login link
-            loginLink.classList.add('hidden');
-            
-            // Update profile picture with user's actual image
-            profileAvatar.src = profilePictureUrl;
-        }
-
-        // Function to handle logout (you can call this from your logout button)
-        function handleLogout() {
-            currentUser = null;
-            const loginLink = document.getElementById('login-link');
-            const profileAvatar = document.getElementById('profile-avatar');
-            
-            // Show login link
-            loginLink.classList.remove('hidden');
-            
-            // Reset profile picture to placeholder
-            profileAvatar.src = 'https://placehold.co/100x100/fbbf24/1f2937?text=P';
-        }
+        let votedPolls = new Set(); // Track which polls user has voted on
 
         // Poll Option Adder
         document.getElementById('add-poll-option').addEventListener('click', function(e){
@@ -229,23 +196,7 @@
             }
         });
 
-        // Dark mode toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        
-        if (currentTheme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-        });
-
-        // Check user session on page load
         document.addEventListener('DOMContentLoaded', function() {
-            checkUserSession();
             loadPolls();
         });
 
@@ -258,13 +209,13 @@
                         displayPolls(data.polls);
                     } else {
                         document.getElementById('polls-container').innerHTML = 
-                            '<div class="text-center py-8"><p class="text-red-600">Error loading polls: ' + data.message + '</p></div>';
+                            '<div class="text-center py-8"><p class="text-red-600 dark:text-red-400">Error loading polls: ' + data.message + '</p></div>';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     document.getElementById('polls-container').innerHTML = 
-                        '<div class="text-center py-8"><p class="text-red-600">Failed to load polls. Please try again.</p></div>';
+                        '<div class="text-center py-8"><p class="text-red-600 dark:text-red-400">Failed to load polls. Please try again.</p></div>';
                 });
         }
 
@@ -287,31 +238,232 @@
             container.innerHTML = polls.map(poll => {
                 const color = categoryColors[poll.category] || 'gray';
                 const totalVotes = poll.options.reduce((sum, opt) => sum + parseInt(opt.vote_count || 0), 0);
+                const hasVoted = votedPolls.has(poll.poll_id);
                 
                 return `
-                    <div class="poll-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-${color}-500 transition-colors duration-300 card-hover">
+                    <div class="poll-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-${color}-500 transition-colors duration-300 card-hover mb-6">
                         <div class="flex justify-between items-start mb-3">
                             <h4 class="text-xl font-semibold text-gray-900 dark:text-gray-50">${escapeHtml(poll.question)}</h4>
                             <span class="text-xs font-medium text-white bg-${color}-500 px-3 py-1 rounded-full shadow-md">${poll.category}</span>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Posted by: ${poll.is_anonymous ? 'Anonymous' : 'User'}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            Posted by: ${poll.is_anonymous ? 'Anonymous' : 'User'} • 
+                            <span class="text-amber-600 dark:text-amber-400 font-semibold">${totalVotes} votes</span>
+                        </p>
                         
-                        <form class="space-y-3 poll-vote-form" data-poll-id="${poll.poll_id}">
-                            ${poll.options.map(option => `
-                                <label class="block">
-                                    <input type="radio" name="vote_option_${poll.poll_id}" value="${option.option_id}" class="form-radio h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
-                                    <span class="ml-2 text-gray-700 dark:text-gray-300 font-medium">${escapeHtml(option.option_text)}</span>
-                                </label>
-                            `).join('')}
-                            <button type="submit" class="mt-4 w-full bg-amber-500 text-white font-semibold py-2 rounded-lg hover:bg-amber-600 transition shadow">Vote</button>
-                        </form>
-                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-3 border-t pt-2">
-                            <span>Total Votes: ${totalVotes}</span>
+                        ${hasVoted ? renderPollResults(poll, totalVotes, color) : renderVotingForm(poll)}
+                        
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                             <span>Status: Active</span>
+                            <span>${new Date(poll.created_at).toLocaleDateString()}</span>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            // Add event listeners for voting
+            attachVoteHandlers();
+        }
+
+        // Render voting form
+        function renderVotingForm(poll) {
+            return `
+                <form class="space-y-3 poll-vote-form" data-poll-id="${poll.poll_id}">
+                    ${poll.options.map(option => `
+                        <label class="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition">
+                            <input type="radio" name="vote_option_${poll.poll_id}" value="${option.option_id}" class="form-radio h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-medium">${escapeHtml(option.option_text)}</span>
+                        </label>
+                    `).join('')}
+                    <button type="submit" class="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-lg transition shadow-md hover:shadow-lg transform hover:scale-[1.02]">
+                        <i class="fas fa-check-circle mr-2"></i> Cast Vote
+                    </button>
+                </form>
+            `;
+        }
+
+        // Render poll results with toggle between bar and chart view
+        function renderPollResults(poll, totalVotes, color) {
+            const chartId = `chart-${poll.poll_id}`;
+            
+            return `
+                <div class="poll-results">
+                    <!-- View Toggle -->
+                    <div class="flex justify-end mb-4 space-x-2">
+                        <button onclick="toggleView(${poll.poll_id}, 'bar')" class="view-toggle-btn active px-3 py-1 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-amber-500 hover:text-white transition" data-view="bar">
+                            <i class="fas fa-chart-bar mr-1"></i> Bars
+                        </button>
+                        <button onclick="toggleView(${poll.poll_id}, 'chart')" class="view-toggle-btn px-3 py-1 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-amber-500 hover:text-white transition" data-view="chart">
+                            <i class="fas fa-chart-pie mr-1"></i> Chart
+                        </button>
+                    </div>
+
+                    <!-- Progress Bars View -->
+                    <div id="bar-view-${poll.poll_id}" class="space-y-4">
+                        ${poll.options.map(option => {
+                            const votes = parseInt(option.vote_count || 0);
+                            const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
+                            return `
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${escapeHtml(option.option_text)}</span>
+                                        <span class="text-sm font-bold text-amber-600 dark:text-amber-400">${percentage}% (${votes})</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                                        <div class="progress-bar bg-gradient-to-r from-amber-400 to-amber-600 h-3 rounded-full shadow-inner transition-all duration-1000" 
+                                             style="width: ${percentage}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <!-- Chart View (Hidden by default) -->
+                    <div id="chart-view-${poll.poll_id}" class="hidden">
+                        <div class="flex justify-center">
+                            <canvas id="${chartId}" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle between bar and chart view
+        window.toggleView = function(pollId, view) {
+            const barView = document.getElementById(`bar-view-${pollId}`);
+            const chartView = document.getElementById(`chart-view-${pollId}`);
+            const pollCard = barView.closest('.poll-card');
+            const buttons = pollCard.querySelectorAll('.view-toggle-btn');
+            
+            // Update active state of buttons
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-view') === view) {
+                    btn.classList.add('active', 'bg-amber-500', 'text-white');
+                    btn.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                } else {
+                    btn.classList.remove('active', 'bg-amber-500', 'text-white');
+                    btn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                }
+            });
+
+            if (view === 'bar') {
+                barView.classList.remove('hidden');
+                chartView.classList.add('hidden');
+            } else {
+                barView.classList.add('hidden');
+                chartView.classList.remove('hidden');
+                // Create chart if not already created
+                createPollChart(pollId);
+            }
+        }
+
+        // Create Chart.js doughnut chart
+        function createPollChart(pollId) {
+            const canvas = document.getElementById(`chart-${pollId}`);
+            if (!canvas || canvas.chart) return; // Already created
+
+            // Get poll data
+            fetch(`api/polls.php?api=1`)
+                .then(response => response.json())
+                .then(data => {
+                    const poll = data.polls.find(p => p.poll_id == pollId);
+                    if (!poll) return;
+
+                    const labels = poll.options.map(opt => opt.option_text);
+                    const votes = poll.options.map(opt => parseInt(opt.vote_count || 0));
+                    const colors = [
+                        '#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A', '#FEF3C7',
+                        '#EF4444', '#F87171', '#FCA5A5', '#FECACA', '#FEE2E2'
+                    ];
+
+                    const chart = new Chart(canvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: votes,
+                                backgroundColor: colors.slice(0, votes.length),
+                                borderWidth: 2,
+                                borderColor: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: document.documentElement.classList.contains('dark') ? '#F3F4F6' : '#1F2937',
+                                        padding: 15,
+                                        font: { size: 12 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                            return `${context.label}: ${context.parsed} votes (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    canvas.chart = chart; // Store reference to prevent recreation
+                });
+        }
+
+        // Attach vote handlers
+        function attachVoteHandlers() {
+            document.querySelectorAll('.poll-vote-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const pollId = this.dataset.pollId;
+                    const selectedOption = this.querySelector('input[type="radio"]:checked');
+                    
+                    if (!selectedOption) {
+                        alert('Please select an option');
+                        return;
+                    }
+
+                    // Simulate vote (you'll need to implement actual API call)
+                    votedPolls.add(parseInt(pollId));
+                    
+                    // Show success message
+                    showToast('Vote cast successfully! 🎉', 'success');
+                    
+                    // Reload polls to show results
+                    setTimeout(() => loadPolls(), 500);
+                });
+            });
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            toast.className = `fixed top-20 right-4 ${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-slide-in`;
+            toast.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-check-circle text-xl"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slide-out 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         // Helper function to escape HTML
@@ -321,5 +473,17 @@
             return div.innerHTML;
         }
     </script>
+
+    <style>
+    @keyframes slide-in {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slide-out {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+    .animate-slide-in { animation: slide-in 0.3s ease-out; }
+    </style>
 </body>
 </html>

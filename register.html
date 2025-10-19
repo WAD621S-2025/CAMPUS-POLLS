@@ -2,50 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - BUZZ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign Up - BUZZ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="assets/js/theme.js"></script>
+    <style>
+        .honeycomb-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .alert {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center min-h-screen relative">
+<body class="bg-amber-50 dark:bg-gray-900 min-h-screen flex items-center justify-center relative font-inter transition-colors duration-300">
     <div class="honeycomb-bg"></div>
-
-    <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-2xl border-4 border-amber-400 dark:border-amber-600 relative z-10">
-        <div class="text-center mb-6">
-            <div class="text-6xl float-animation mb-4">🐝</div>
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Join the Hive!</h2>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Create your BUZZ account</p>
-        </div>
-        
-       <form action="api/register.php" method="POST">
-    <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
-        <input type="text" name="username" id="username" class="mt-1 block w-full px-3 py-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500" required>
-    </div>
-    <div class="mb-4">
-        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-        <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500" required>
-    </div>
-    <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
-        <input type="password" name="password" id="password" class="mt-1 block w-full px-3 py-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500" required>
-    </div>
-    <div class="mb-6">
-        <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
-        <input type="password" name="confirm_password" id="confirm-password" class="mt-1 block w-full px-3 py-2 border-2 border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500" required>
-    </div>
-    <button type="submit" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-amber-600 dark:to-yellow-700 text-gray-800 dark:text-gray-100 font-bold py-3 rounded-md hover:from-yellow-500 hover:to-amber-600 dark:hover:from-amber-700 dark:hover:to-yellow-800 transition shadow-lg">
-        Register
-    </button>
-</form>
-
-        <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
-            Already have an account? <a href="login.html" class="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline font-semibold">Login here</a>.
-        </p>
-    </div>
     
-    <script src="script.js"></script>
+    <!-- Theme Toggle Button - Fixed Position -->
+    <button id="theme-toggle" class="theme-toggle fixed top-4 right-4 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition" title="Toggle Dark Mode">
+        <i class="fas fa-moon dark:hidden text-gray-800 text-xl"></i>
+        <i class="fas fa-sun hidden dark:inline text-yellow-300 text-xl"></i>
+    </button>
+    
+    <div class="w-full max-w-md p-6 relative z-10">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-gray-100">
+                <i class="fas fa-university text-amber-500"></i> 🐝 BUZZ
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Join the Campus Community</p>
+        </div>
+
+        <!-- Messages -->
+        <div id="message-container" class="mb-6"></div>
+
+        <!-- Register Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transition-colors duration-300">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+                Create Your Account
+            </h2>
+
+            <form action="api/register.php" method="POST" class="space-y-4">
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fas fa-user mr-1"></i> Full Name
+                    </label>
+                    <input type="text" name="full_name" id="full_name" required
+                           class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 transition-colors"
+                           placeholder="John Doe">
+                </div>
+
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fas fa-at mr-1"></i> Username
+                    </label>
+                    <input type="text" name="username" id="username" required
+                           class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 transition-colors"
+                           placeholder="johndoe">
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fas fa-envelope mr-1"></i> Email
+                    </label>
+                    <input type="email" name="email" id="email" required
+                           class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 transition-colors"
+                           placeholder="your.email@university.edu">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fas fa-lock mr-1"></i> Password
+                    </label>
+                    <input type="password" name="password" id="password" required minlength="8"
+                           class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 transition-colors"
+                           placeholder="At least 8 characters">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Must be at least 8 characters</p>
+                </div>
+
+                <div>
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <i class="fas fa-lock mr-1"></i> Confirm Password
+                    </label>
+                    <input type="password" name="confirm_password" id="confirm_password" required
+                           class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 transition-colors"
+                           placeholder="Re-enter password">
+                </div>
+
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold py-3 rounded-lg hover:bg-amber-700 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+                    <i class="fas fa-user-plus mr-2"></i> Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Already have an account? 
+                    <a href="login.html" class="text-amber-600 hover:text-amber-700 dark:text-amber-400 font-medium">Login</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-6">
+            <a href="index.html" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <div class="bee-mascot fixed bottom-8 right-8 z-40 cursor-pointer hover:scale-110 transition-transform duration-300" title="Buzz the Bee!">
+    <div class="relative animate-bounce">
+        <span class="text-6xl filter drop-shadow-lg">🐝</span>
+        <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+            Hi there!
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+.bee-mascot {
+    animation: float 3s ease-in-out infinite;
+}
+</style>
+
+    <script>
+        // Show messages
+        function showMessage(type, message) {
+            const container = document.getElementById('message-container');
+            const bgColor = type === 'success' 
+                ? 'bg-green-100 border-green-500 text-green-700 dark:bg-green-900 dark:text-green-200' 
+                : 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900 dark:text-red-200';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            container.innerHTML = `
+                <div class="alert ${bgColor} border-l-4 p-4 rounded-lg shadow-md flex items-center">
+                    <i class="fas ${icon} mr-3 text-lg"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" class="ml-auto">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        // Check for errors
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error')) {
+            const errorMessages = {
+                'passwords_mismatch': 'Passwords do not match.',
+                'email_exists': 'Email already registered.',
+                'username_exists': 'Username already taken.',
+                'missing_fields': 'Please fill in all fields.',
+                'weak_password': 'Password must be at least 8 characters.'
+            };
+            showMessage('error', errorMessages[urlParams.get('error')] || 'An error occurred.');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // Password match validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+            
+            if (password !== confirm) {
+                e.preventDefault();
+                showMessage('error', 'Passwords do not match!');
+            }
+        });
+    </script>
 </body>
 </html>
