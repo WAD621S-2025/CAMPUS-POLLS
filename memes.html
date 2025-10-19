@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
      <script src="assets/js/theme.js"></script>
+     <script src="assets/js/auth.js"></script>
     <style>
         /* Your usual styling */
         .card-hover {
@@ -264,37 +265,207 @@
 
     // --- API & Rendering Logic ---
 
-    async function loadMemesFromAPI() {
-        // Show loading indicator
-        const container = document.getElementById('memes-grid');
-        container.innerHTML = `<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i><p class="mt-2 text-gray-500 dark:text-gray-400">Loading memes...</p></div>`;
+   // Replace the loadMemesFromAPI function in your memes.html with this:
 
-        try {
-            
-            const response = await fetch('/CAMPUS-POLLS/api/get_memes.php');
-            const data = await response.json();
-            
-            if (data.success) {
-                memesData = data.memes.map(meme => ({
-                    ...meme,
-                    meme_id: parseInt(meme.meme_id),
-                    likes_count: parseInt(meme.likes_count) || 0,
-                    liked: parseInt(meme.liked) === 1,
-                    comments: meme.comments || []
-                }));
-                memesLoaded = 0;
-                renderMemes(true);
-            } else {
-                showNotification(data.message || 'Failed to load memes', 'error');
-                container.innerHTML = `<div class="text-center py-8 text-red-500 dark:text-red-400"><i class="fas fa-exclamation-circle text-4xl"></i><p class="mt-2">Failed to load memes: ${data.message || 'Unknown error'}</p></div>`;
-            }
-        } catch (error) {
-            console.error('Network Error:', error);
-            showNotification('Network error loading memes', 'error');
-            const container = document.getElementById('memes-grid');
-            container.innerHTML = `<div class="text-center py-8 text-red-500 dark:text-red-400"><i class="fas fa-exclamation-circle text-4xl"></i><p class="mt-2">Network error. Please check the API endpoint.</p></div>`;
+async function loadMemesFromAPI() {
+    const container = document.getElementById('memes-grid');
+    container.innerHTML = `<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i><p class="mt-2 text-gray-500 dark:text-gray-400">Loading memes...</p></div>`;
+
+    try {
+        // Use absolute path from root
+        const response = await fetch('/api/get_memes.php');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            memesData = data.memes.map(meme => ({
+                ...meme,
+                meme_id: parseInt(meme.meme_id),
+                likes_count: parseInt(meme.likes_count) || 0,
+                liked: parseInt(meme.liked) === 1,
+                comments: meme.comments || []
+            }));
+            memesLoaded = 0;
+            renderMemes(true);
+        } else {
+            showNotification(data.message || 'Failed to load memes', 'error');
+            container.innerHTML = `<div class="text-center py-8">
+                <p class="text-red-600 dark:text-red-400">
+                    <i class="fas fa-exclamation-circle text-4xl mb-2"></i><br>
+                    Error: ${data.message || 'Unknown API error'}
+                </p>
+            </div>`;
+        }
+    } catch (error) {
+        console.error('Error loading memes:', error);
+        showNotification('Network error loading memes', 'error');
+        container.innerHTML = `<div class="text-center py-8">
+            <p class="text-red-600 dark:text-red-400">
+                <i class="fas fa-exclamation-circle text-4xl mb-2"></i><br>
+                Network error: ${error.message}<br>
+                <small>Check console for details</small>
+            </p>
+        </div>`;
     }
+}
+
+// Also update the upload button event listener - find this section and replace:
+
+uploadBtn.addEventListener('click', async () => {
+    const caption = document.getElementById('meme-caption').value.trim();
+    const file = fileInput.files[0];
+
+    if(!file || !caption) {
+        showNotification('Please select an image and enter a caption', 'error');
+        return;
+    }
+
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('caption', caption);
+
+    try {
+        // Use absolute path from root
+        const response = await fetch('/api/upload_meme.php', { 
+            method: 'POST', 
+            body: formData 
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+
+        if(data.success) {
+            showNotification('Meme uploaded successfully! 🎉', 'success');
+            fileInput.value = '';
+            document.getElementById('meme-caption').value = '';
+            previewContainer.classList.add('hidden');
+            await loadMemesFromAPI();
+        } else {
+            showNotification(data.message || 'Upload failed', 'error');
+        }
+    } catch(error) {
+        console.error('Upload error:', error);
+        showNotification('Upload error: ' + error.message, 'error');
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Upload Meme';
+    }
+});
+
+// Update handleLike function:
+async function handleLike(e, memeId) {
+    const meme = memesData.find(m => m.meme_id === memeId);
+    const button = e.currentTarget;
+    const icon = button.querySelector('i');
+    const card = button.closest('.meme-card');
+    const countSpan = card.querySelector('.like-count');
+    
+    button.disabled = true;
+
+    try {
+        const formData = new FormData();
+        formData.append('meme_id', memeId);
+
+        const response = await fetch('/api/meme_like.php', { 
+            method: 'POST', 
+            body: formData 
+        });
+        const data = await response.json();
+
+        if(data.success) {
+            meme.liked = data.liked;
+            meme.likes_count = data.likes_count;
+
+            if(meme.liked) {
+                button.classList.add('text-red-500');
+                button.classList.remove('text-gray-700', 'dark:text-gray-300');
+                icon.classList.add('like-animation');
+                createFloatingHearts(button);
+            } else {
+                button.classList.remove('text-red-500');
+                button.classList.add('text-gray-700', 'dark:text-gray-300');
+            }
+
+            countSpan.textContent = meme.likes_count;
+            setTimeout(() => icon.classList.remove('like-animation'), 500);
+        } else {
+            showNotification(data.message || 'Failed to update like. Are you logged in?', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Failed to update like due to a network error.', 'error');
+    } finally {
+        button.disabled = false;
+    }
+}
+
+// Update handleAddComment function:
+async function handleAddComment(memeId) {
+    const meme = memesData.find(m => m.meme_id === memeId);
+    const input = document.getElementById(`comment-input-${memeId}`);
+    const commentText = input.value.trim();
+    const addCommentBtn = document.querySelector(`.add-comment-btn[data-id="${memeId}"]`);
+    if(!commentText) return;
+    
+    addCommentBtn.disabled = true;
+
+    try {
+        const formData = new FormData();
+        formData.append('meme_id', memeId);
+        formData.append('comment_text', commentText);
+
+        const response = await fetch('/api/meme_comment.php', { 
+            method:'POST', 
+            body: formData 
+        });
+        const data = await response.json();
+
+        if(data.success) {
+            const newComment = {
+                id: data.comment_id || Date.now(),
+                username: data.username || 'You', 
+                profile_image: data.profile_image,
+                text: commentText,
+                likes: 0,
+                created_at: data.time || 'Just now'
+            };
+
+            if (!meme.comments) {
+                meme.comments = [];
+            }
+            meme.comments.push(newComment);
+
+            const container = document.getElementById(`comments-${memeId}`);
+            const hiddenComments = container.querySelector('.hidden-comments');
+            
+            if(meme.comments.length > 2 && hiddenComments) {
+                hiddenComments.insertAdjacentHTML('beforeend', createCommentHTML(newComment));
+            } else {
+                container.insertAdjacentHTML('beforeend', createCommentHTML(newComment));
+            }
+
+            input.value = '';
+            showNotification('Comment posted! 💬', 'success');
+        } else {
+            showNotification(data.message || 'Failed to post comment', 'error');
+        }
+    } catch(error) {
+        console.error('Error:', error);
+        showNotification('Failed to post comment due to network error.', 'error');
+    } finally {
+        if(input.value.trim() === '') addCommentBtn.disabled = true; 
+    }
+}
 
     function createCommentHTML(comment) {
         let profileImageUrl = comment.profile_image || 'https://placehold.co/32x32/f59e0b/1f2937?te';
