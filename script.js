@@ -1,6 +1,51 @@
 
 $(document).ready(function() {
 
+  const fileInput = $('#meme-upload');
+  const uploadBtn = $('#upload-btn');
+  const previewContainer = $('#preview-container');
+
+  uploadBtn.on('click', async function() {
+    const caption = $('#meme-caption').val().trim();
+    const file = fileInput[0].files[0];
+
+    if (!file || !caption) {
+      showNotification('Please select an image and enter a caption');
+      return;
+    }
+
+    uploadBtn.prop('disabled', true);
+    uploadBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...');
+
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('caption', caption);
+
+    try {
+      const response = await fetch('api/upload_meme.php', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'  // if your session cookie is required
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        showNotification('Meme uploaded successfully! 🎉');
+        fileInput.val('');
+        $('#meme-caption').val('');
+        previewContainer.addClass('hidden');
+        fetchMemes(); // Reload memes to show new upload
+      } else {
+        showNotification(data.message || 'Upload failed');
+      }
+    } catch (error) {
+      showNotification('Upload error: ' + error.message);
+    } finally {
+      uploadBtn.prop('disabled', false);
+      uploadBtn.html('<i class="fas fa-paper-plane mr-2"></i> Upload Meme');
+    }
+  });
+
 
   // Polls Features
   function fetchPolls() {
@@ -301,3 +346,4 @@ $(document).ready(function() {
   fetchPolls();
   fetchMemes();
 });
+

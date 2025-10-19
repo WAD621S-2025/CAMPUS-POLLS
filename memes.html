@@ -270,7 +270,7 @@
         container.innerHTML = `<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-amber-500"></i><p class="mt-2 text-gray-500 dark:text-gray-400">Loading memes...</p></div>`;
 
         try {
-            // Include parameters for pagination/sorting if needed, but for now, just fetch all
+            
             const response = await fetch('/CAMPUS-POLLS/api/get_memes.php');
             const data = await response.json();
             
@@ -297,7 +297,7 @@
     }
 
     function createCommentHTML(comment) {
-        let profileImageUrl = comment.profile_image || 'https://placehold.co/32x32/f59e0b/1f2937?text=U';
+        let profileImageUrl = comment.profile_image || 'https://placehold.co/32x32/f59e0b/1f2937?te';
         if (profileImageUrl && !profileImageUrl.startsWith('http') && !profileImageUrl.startsWith('/')) {
             profileImageUrl = '/CAMPUS-POLLS/' + profileImageUrl;
         }
@@ -469,8 +469,6 @@
         }
     }
 
-    // --- Core Like Handler (As provided and confirmed correct) ---
-
     async function handleLike(e, memeId) {
         const meme = memesData.find(m => m.meme_id === memeId);
         const button = e.currentTarget;
@@ -556,7 +554,7 @@
             if(data.success) {
                 const newComment = {
                     id: data.comment_id || Date.now(),
-                    username: data.username || 'You', // Assuming PHP returns the logged-in user's info
+                    username: data.username || 'You', 
                     profile_image: data.profile_image,
                     text: commentText,
                     likes: 0,
@@ -637,7 +635,7 @@
             formData.append('caption', caption);
 
             try {
-                const response = await fetch('/CAMPUS-POLLS/api/upload_meme.php', { method: 'POST', body: formData });
+                const response = await fetch('api/upload_meme.php', { method: 'POST', body: formData });
                 const data = await response.json();
 
                 if(data.success) {
